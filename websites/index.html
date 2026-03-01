@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEZR — Breathing, Focus & Wellness App</title>
+  <meta name="description" content="MEZR is a minimalist breathing exercise, zen, and wellness app. Breathe, focus, and build better habits — across every device.">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:title" content="MEZR — Breathing, Focus & Wellness">
+  <meta property="og:description" content="Minimalist breathing exercises, zen modes, and tools for focus. Free on Google Play. Coming to iOS, Web, and Watch.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mezr-app.github.io">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #000000;
+      --off-black: #0A0A0A;
+      --dark-gray: #111111;
+      --mid-gray: #1a1a1a;
+      --border: #222222;
+      --text-dim: #555555;
+      --text-secondary: #999999;
+      --text-primary: #e0e0e0;
+      --white: #ffffff;
+      --font-display: 'Instrument Serif', Georgia, serif;
+      --font-body: 'DM Sans', -apple-system, sans-serif;
+      --ease-out: cubic-bezier(0.0, 0, 0.2, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    body { font-family:var(--font-body); background:var(--black); color:var(--text-primary); line-height:1.6; overflow-x:hidden; }
+    .container { max-width:1100px; margin:0 auto; padding:0 24px; }
+    .reveal { opacity:0; transform:translateY(30px); transition:opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out); }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* NAV */
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:20px 0; transition:background 0.3s, backdrop-filter 0.3s; }
+    nav.scrolled { background:rgba(0,0,0,0.8); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); }
+    nav .container { display:flex; justify-content:space-between; align-items:center; }
+    .nav-logo { font-family:var(--font-body); font-size:1.25rem; font-weight:600; color:var(--white); text-decoration:none; letter-spacing:0.15em; }
+    .nav-links { display:flex; gap:32px; align-items:center; list-style:none; }
+    .nav-links a { color:var(--text-secondary); text-decoration:none; font-size:0.875rem; font-weight:400; letter-spacing:0.02em; transition:color 0.2s; }
+    .nav-links a:hover { color:var(--white); }
+    .nav-cta { background:var(--white)!important; color:var(--black)!important; padding:8px 20px; border-radius:100px; font-weight:500!important; transition:opacity 0.2s!important; }
+    .nav-cta:hover { opacity:0.85; }
+
+    /* HERO */
+    .hero { min-height:100vh; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; padding:120px 24px 80px; }
+    .hero-orb-bg { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:500px; height:500px; pointer-events:none; }
+    .orb-ring { position:absolute; top:50%; left:50%; border-radius:50%; border:1px solid rgba(255,255,255,0.04); transform:translate(-50%,-50%); animation:orb-breathe 4.25s var(--ease-in-out) infinite; }
+    .orb-ring:nth-child(1) { width:200px; height:200px; border-color:rgba(255,255,255,0.06); }
+    .orb-ring:nth-child(2) { width:300px; height:300px; animation-delay:0.15s; }
+    .orb-ring:nth-child(3) { width:400px; height:400px; animation-delay:0.3s; }
+    .orb-ring:nth-child(4) { width:500px; height:500px; animation-delay:0.45s; border-color:rgba(255,255,255,0.02); }
+    @keyframes orb-breathe { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1;} 47%{transform:translate(-50%,-50%) scale(1.15);opacity:0.6;} }
+    .hero-content { position:relative; z-index:2; text-align:center; max-width:680px; }
+    .hero-badge { display:inline-block; font-size:0.75rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); border:1px solid var(--border); padding:6px 16px; border-radius:100px; margin-bottom:32px; animation:fade-in 0.8s var(--ease-out) 0.2s both; }
+    .hero-title { font-family:var(--font-display); font-size:clamp(3rem,8vw,5.5rem); font-weight:400; line-height:1.05; color:var(--white); letter-spacing:-0.03em; margin-bottom:24px; animation:fade-up 0.8s var(--ease-out) 0.35s both; }
+    .hero-title em { font-style:italic; color:var(--text-secondary); }
+    .hero-subtitle { font-size:1.125rem; font-weight:300; color:var(--text-secondary); max-width:460px; margin:0 auto 48px; line-height:1.7; animation:fade-up 0.8s var(--ease-out) 0.5s both; }
+    .hero-actions { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; animation:fade-up 0.8s var(--ease-out) 0.65s both; }
+    @keyframes fade-in { from{opacity:0;} to{opacity:1;} }
+    @keyframes fade-up { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+
+    /* BUTTONS */
+    .btn { display:inline-flex; align-items:center; gap:10px; padding:14px 32px; border-radius:100px; font-family:var(--font-body); font-size:0.9375rem; font-weight:500; text-decoration:none; transition:all 0.25s var(--ease-out); cursor:pointer; border:none; }
+    .btn-primary { background:var(--white); color:var(--black); }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(255,255,255,0.12); }
+    .btn-secondary { background:transparent; color:var(--text-secondary); border:1px solid var(--border); }
+    .btn-secondary:hover { color:var(--white); border-color:var(--text-dim); }
+    .btn svg { width:20px; height:20px; }
+
+    /* SCROLL HINT */
+    .scroll-hint { position:absolute; bottom:40px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--text-dim); font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; animation:fade-in 1s var(--ease-out) 1.2s both; }
+    .scroll-line { width:1px; height:32px; background:linear-gradient(to bottom,var(--text-dim),transparent); animation:scroll-pulse 2s ease infinite; }
+    @keyframes scroll-pulse { 0%,100%{opacity:1;transform:scaleY(1);} 50%{opacity:0.3;transform:scaleY(0.6);} }
+
+    /* PLATFORMS */
+    .platforms { padding:80px 0; border-top:1px solid var(--border); }
+    .platforms .container { text-align:center; }
+    .platforms-label { font-size:0.75rem; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-dim); margin-bottom:40px; }
+    .platforms-grid { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; max-width:700px; margin:0 auto; }
+    .platform-chip { display:inline-flex; align-items:center; gap:10px; padding:14px 24px; border-radius:14px; border:1px solid var(--border); background:var(--off-black); transition:border-color 0.3s, background 0.3s; }
+    .platform-chip:hover { border-color:#333; background:var(--dark-gray); }
+    .platform-chip.live { border-color:#2a2a2a; }
+    .platform-icon { width:28px; height:28px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .platform-icon svg { width:22px; height:22px; fill:var(--white); }
+    .platform-chip.coming-soon .platform-icon svg { fill:var(--text-secondary); }
+    .platform-info { text-align:left; }
+    .platform-name { font-size:0.9375rem; font-weight:500; color:var(--white); line-height:1.2; }
+    .platform-chip.coming-soon .platform-name { color:var(--text-secondary); }
+    .platform-status { font-size:0.6875rem; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-dim); margin-top:2px; }
+
+    /* FEATURES */
+    .features { padding:120px 0; border-top:1px solid var(--border); }
+    .features-header { text-align:center; margin-bottom:80px; }
+    .section-label { font-size:0.75rem; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-dim); margin-bottom:16px; }
+    .section-title { font-family:var(--font-display); font-size:clamp(2rem,4vw,3rem); font-weight:400; color:var(--white); letter-spacing:-0.02em; }
+    .section-subtitle { font-size:1rem; color:var(--text-secondary); font-weight:300; max-width:520px; margin:16px auto 0; line-height:1.6; }
+    .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:20px; overflow:hidden; }
+    .feature-card { background:var(--off-black); padding:48px 36px; transition:background 0.3s; }
+    .feature-card:hover { background:var(--dark-gray); }
+    .feature-icon { width:48px; height:48px; border-radius:12px; background:var(--mid-gray); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; margin-bottom:24px; font-size:1.25rem; }
+    .feature-card h3 { font-family:var(--font-body); font-size:1.0625rem; font-weight:500; color:var(--white); margin-bottom:10px; display:flex; align-items:center; gap:10px; }
+    .feature-card p { font-size:0.875rem; color:var(--text-secondary); line-height:1.65; }
+    .badge-soon { display:inline-block; font-size:0.5625rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim); background:var(--mid-gray); border:1px solid var(--border); padding:3px 8px; border-radius:6px; }
+
+    /* HOW IT WORKS */
+    .how-it-works { padding:120px 0; border-top:1px solid var(--border); }
+    .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:48px; margin-top:80px; }
+    .step-number { font-family:var(--font-display); font-size:3.5rem; font-style:italic; color:var(--border); line-height:1; margin-bottom:20px; transition:color 0.3s; }
+    .step:hover .step-number { color:var(--text-dim); }
+    .step h3 { font-size:1rem; font-weight:500; color:var(--white); margin-bottom:8px; }
+    .step p { font-size:0.875rem; color:var(--text-secondary); line-height:1.6; }
+
+    /* DEMO */
+    .demo-section { padding:120px 0; border-top:1px solid var(--border); text-align:center; }
+    .demo-visual { margin:64px auto 0; width:280px; height:280px; position:relative; display:flex; align-items:center; justify-content:center; }
+    .demo-circle-main { width:100px; height:100px; border-radius:50%; border:2px solid var(--white); animation:demo-breathe 4.25s var(--ease-in-out) infinite; position:relative; z-index:2; }
+    @keyframes demo-breathe { 0%,100%{transform:scale(1);} 47%{transform:scale(1.8);} }
+    .demo-circle-secondary { position:absolute; width:24px; height:24px; border-radius:50%; border:1px solid rgba(255,255,255,0.25); animation:demo-orbit 4.25s var(--ease-in-out) infinite; }
+    @keyframes demo-orbit { 0%,100%{transform:translate(var(--x),var(--y)) scale(1);} 47%{transform:translate(calc(var(--x)*1.18),calc(var(--y)*1.18)) scale(1);} }
+    .demo-label { position:absolute; bottom:-48px; left:50%; transform:translateX(-50%); font-size:1.125rem; font-weight:300; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-secondary); }
+
+    /* VISION */
+    .vision { padding:120px 0; border-top:1px solid var(--border); }
+    .vision-grid { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:start; margin-top:80px; }
+    .vision-text h3 { font-family:var(--font-display); font-size:clamp(1.75rem,3vw,2.25rem); font-weight:400; color:var(--white); letter-spacing:-0.02em; margin-bottom:20px; }
+    .vision-text p { font-size:0.9375rem; color:var(--text-secondary); line-height:1.75; margin-bottom:16px; }
+    .vision-roadmap { display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+    .roadmap-item { background:var(--off-black); padding:28px 32px; display:flex; align-items:flex-start; gap:20px; transition:background 0.3s; }
+    .roadmap-item:hover { background:var(--dark-gray); }
+    .roadmap-icon { width:40px; height:40px; border-radius:10px; background:var(--mid-gray); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:1.1rem; }
+    .roadmap-content h4 { font-size:0.9375rem; font-weight:500; color:var(--white); margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+    .roadmap-content p { font-size:0.8125rem; color:var(--text-secondary); line-height:1.55; }
+    .badge-live { display:inline-block; font-size:0.5625rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#4ADE80; background:#1a2e1a; border:1px solid #2a4a2a; padding:3px 8px; border-radius:6px; }
+
+    /* STATS BAR */
+    .stats-bar { padding:64px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .stats-bar .container { display:flex; justify-content:center; gap:80px; flex-wrap:wrap; }
+    .stat-item { text-align:center; }
+    .stat-value { font-family:var(--font-display); font-size:2.5rem; color:var(--white); line-height:1.1; }
+    .stat-label { font-size:0.8125rem; color:var(--text-dim); margin-top:6px; letter-spacing:0.04em; }
+
+    /* CTA */
+    .cta-section { padding:140px 0; text-align:center; position:relative; }
+    .cta-section::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:600px; height:600px; background:radial-gradient(circle,rgba(255,255,255,0.03) 0%,transparent 70%); pointer-events:none; }
+    .cta-title { font-family:var(--font-display); font-size:clamp(2.5rem,5vw,4rem); font-weight:400; color:var(--white); letter-spacing:-0.02em; margin-bottom:20px; position:relative; }
+    .cta-subtitle { font-size:1.0625rem; color:var(--text-secondary); font-weight:300; margin-bottom:48px; position:relative; }
+
+    /* FOOTER */
+    footer { padding:48px 0; border-top:1px solid var(--border); }
+    footer .container { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+    .footer-left { display:flex; align-items:center; gap:24px; }
+    .footer-logo { font-family:var(--font-body); font-size:1rem; font-weight:600; color:var(--white); letter-spacing:0.15em; }
+    .footer-links { display:flex; gap:24px; list-style:none; }
+    .footer-links a { color:var(--text-dim); text-decoration:none; font-size:0.8125rem; transition:color 0.2s; }
+    .footer-links a:hover { color:var(--text-secondary); }
+    .footer-copy { font-size:0.75rem; color:var(--text-dim); }
+
+    /* RESPONSIVE */
+    @media (max-width:900px) {
+      .features-grid { grid-template-columns:1fr; }
+      .steps { grid-template-columns:repeat(2,1fr); gap:40px; }
+      .stats-bar .container { gap:48px; }
+      .nav-links { gap:20px; }
+      .vision-grid { grid-template-columns:1fr; gap:48px; }
+    }
+    @media (max-width:600px) {
+      .hero { padding:100px 24px 80px; }
+      .steps { grid-template-columns:1fr; gap:36px; }
+      .stats-bar .container { gap:36px; }
+      .nav-links .nav-link-text { display:none; }
+      .hero-actions { flex-direction:column; align-items:center; }
+      .btn { width:100%; max-width:280px; justify-content:center; }
+      footer .container { flex-direction:column; text-align:center; }
+      .footer-left { flex-direction:column; }
+      .platforms-grid { flex-direction:column; align-items:center; }
+      .platform-chip { width:100%; max-width:260px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="container">
+      <a href="#" class="nav-logo">MEZR</a>
+      <ul class="nav-links">
+        <li><a href="#features" class="nav-link-text">Features</a></li>
+        <li><a href="#vision" class="nav-link-text">Vision</a></li>
+        <li><a href="https://play.google.com/store/apps/details?id=com.mezrapp.mezr" class="nav-cta">Download</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-orb-bg" aria-hidden="true">
+      <div class="orb-ring"></div>
+      <div class="orb-ring"></div>
+      <div class="orb-ring"></div>
+      <div class="orb-ring"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">Now on Google Play</div>
+      <h1 class="hero-title">Breathe with <em>intention</em></h1>
+      <p class="hero-subtitle">Breathing exercises, zen modes, and mindful tools — built for focus, calm, and clarity. One app, every platform.</p>
+      <div class="hero-actions">
+        <a href="https://play.google.com/store/apps/details?id=com.mezrapp.mezr" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.609 22.186a2.372 2.372 0 0 1-.609-1.593V3.407c0-.607.222-1.16.609-1.593zm.921-.752L15.6 7.191l-2.889 2.889L4.53 1.062zM16.72 11.455l2.852 1.62c.485.275.785.765.785 1.28 0 .516-.3 1.006-.785 1.28l-2.852 1.62-3.166-3.166zM4.53 22.938l8.181-8.018 2.889 2.889L4.53 22.938z"/></svg>
+          Get MEZR Free
+        </a>
+        <a href="#features" class="btn btn-secondary">Explore Features</a>
+      </div>
+    </div>
+    <div class="scroll-hint"><span>Scroll</span><div class="scroll-line"></div></div>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section class="platforms">
+    <div class="container reveal">
+      <p class="platforms-label">Available & Coming Soon</p>
+      <div class="platforms-grid">
+        <div class="platform-chip live">
+          <div class="platform-icon"><svg viewBox="0 0 24 24"><path d="M6 18c0 .55.45 1 1 1h1v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h2v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h1c.55 0 1-.45 1-1V7H6v11zM3.5 7C2.67 7 2 7.67 2 8.5v7c0 .83.67 1.5 1.5 1.5S5 16.33 5 15.5v-7C5 7.67 4.33 7 3.5 7zm17 0c-.83 0-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5zm-4.97-5.84l1.3-1.3c.2-.2.2-.51 0-.71-.2-.2-.51-.2-.71 0l-1.48 1.48A5.84 5.84 0 0012 0c-.96 0-1.86.23-2.66.63L7.85.15c-.2-.2-.51-.2-.71 0-.2.2-.2.51 0 .71l1.31 1.31A5.983 5.983 0 006 6h12c0-2.21-1.2-4.15-2.97-5.19-.01-.02-.01-.04 0-.05l-.5.4zM10 4H9V3h1v1zm5 0h-1V3h1v1z"/></svg></div>
+          <div class="platform-info"><div class="platform-name">Android</div><div class="platform-status" style="color:#4ADE80;">Available Now</div></div>
+        </div>
+        <div class="platform-chip coming-soon">
+          <div class="platform-icon"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg></div>
+          <div class="platform-info"><div class="platform-name">iOS</div><div class="platform-status">Coming Soon</div></div>
+        </div>
+        <div class="platform-chip coming-soon">
+          <div class="platform-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+          <div class="platform-info"><div class="platform-name">Web App</div><div class="platform-status">Coming Soon</div></div>
+        </div>
+        <div class="platform-chip coming-soon">
+          <div class="platform-icon"><svg viewBox="0 0 24 24"><path d="M20 12c0-2.54-1.19-4.81-3.04-6.27L16 0H8l-.95 5.73C5.19 7.19 4 9.45 4 12s1.19 4.81 3.05 6.27L8 24h8l.96-5.73C18.81 16.81 20 14.54 20 12zM6 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6-6-2.69-6-6z"/></svg></div>
+          <div class="platform-info"><div class="platform-name">Watch</div><div class="platform-status">Coming Soon</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="features-header reveal">
+        <p class="section-label">Features</p>
+        <h2 class="section-title">Everything you need, nothing you don't</h2>
+        <p class="section-subtitle">Launching with powerful breathing tools. Growing into a complete wellness platform.</p>
+      </div>
+      <div class="features-grid reveal">
+        <div class="feature-card">
+          <div class="feature-icon">◉</div>
+          <h3>Guided Breathing</h3>
+          <p>Follow the animated orb through inhale and exhale cycles with real breathing audio cues. Set your own pace.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⏱</div>
+          <h3>Breath-Hold Training</h3>
+          <p>Configurable hold timers from 5 to 120 seconds. End early or push through — your call.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚙</div>
+          <h3>Custom Patterns</h3>
+          <p>Build your own breathing circuits with adjustable cycles, holds, inhale and exhale timing.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧘</div>
+          <h3>Zen Mode</h3>
+          <p>Ambient soundscapes with calming visuals. A dedicated space to unwind, meditate, and reset your mind.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Session Tracking</h3>
+          <p>Total sessions, cumulative hold time, weekly and monthly trends — all in beautiful minimal charts.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Privacy First</h3>
+          <p>Your data stays yours. No ads tracking you, no third-party data sales. Simple as that.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Productivity Tools <span class="badge-soon">Soon</span></h3>
+          <p>Focus timers, deep work sessions, and intention-setting tools to pair mindful breathing with meaningful work.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h3>Personal Finance <span class="badge-soon">Soon</span></h3>
+          <p>Mindful money management. Track spending, set savings goals, and build financial habits with calm clarity.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🚗</div>
+          <h3>Driving Mode</h3>
+          <p>Screen dims, audio continues. Safe for commutes and long drives with minimal distraction.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="features-header reveal">
+        <p class="section-label">How It Works</p>
+        <h2 class="section-title">Four steps to calm</h2>
+      </div>
+      <div class="steps reveal">
+        <div class="step"><div class="step-number">01</div><h3>Configure</h3><p>Set your breath count, hold duration, and number of sessions. Or pick a preset pattern.</p></div>
+        <div class="step"><div class="step-number">02</div><h3>Breathe</h3><p>Follow the expanding orb. Inhale as it grows, exhale as it contracts. Let the rhythm guide you.</p></div>
+        <div class="step"><div class="step-number">03</div><h3>Hold</h3><p>After your cycles, the breath hold begins. A timer counts down while the orb gently glows.</p></div>
+        <div class="step"><div class="step-number">04</div><h3>Track</h3><p>Each session is recorded. Watch your hold times improve over days, weeks, and months.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE BREATHING DEMO -->
+  <section class="demo-section">
+    <div class="container">
+      <div class="reveal"><p class="section-label">Live Preview</p><h2 class="section-title">Try the rhythm</h2></div>
+      <div class="demo-visual reveal" id="demoVisual"><div class="demo-circle-main"></div></div>
+      <p class="demo-label reveal" id="demoLabel">Inhale</p>
+    </div>
+  </section>
+
+  <!-- VISION -->
+  <section class="vision" id="vision">
+    <div class="container">
+      <div class="features-header reveal">
+        <p class="section-label">The Vision</p>
+        <h2 class="section-title">More than a breathing app</h2>
+      </div>
+      <div class="vision-grid reveal">
+        <div class="vision-text">
+          <h3>One calm platform for your <em style="font-family:var(--font-display);font-style:italic;">whole</em> life</h3>
+          <p>MEZR starts with breathing — the most fundamental tool for focus and calm. But we're building toward something bigger: a single, private, minimalist platform that helps you manage your mind, your time, and your money.</p>
+          <p>No clutter. No data selling. No dark patterns. Just clean tools that respect your attention and help you live with more intention.</p>
+        </div>
+        <div class="vision-roadmap">
+          <div class="roadmap-item">
+            <div class="roadmap-icon">🫁</div>
+            <div class="roadmap-content"><h4>Breathing & Zen <span class="badge-live">Live</span></h4><p>Guided breathing, breath-hold training, custom patterns, ambient zen modes, and full session tracking.</p></div>
+          </div>
+          <div class="roadmap-item">
+            <div class="roadmap-icon">🎯</div>
+            <div class="roadmap-content"><h4>Focus & Productivity <span class="badge-soon">Coming</span></h4><p>Deep work timers, task intentions, focus scores, and breathing-paired work sessions.</p></div>
+          </div>
+          <div class="roadmap-item">
+            <div class="roadmap-icon">💰</div>
+            <div class="roadmap-content"><h4>Mindful Finance <span class="badge-soon">Coming</span></h4><p>Spending awareness, savings goals, and calm money management — without the anxiety-driven dashboards.</p></div>
+          </div>
+          <div class="roadmap-item">
+            <div class="roadmap-icon">🌐</div>
+            <div class="roadmap-content"><h4>Everywhere You Are <span class="badge-soon">Coming</span></h4><p>iOS, web, and wearable apps — your data syncs seamlessly across every device.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <section class="stats-bar">
+    <div class="container reveal">
+      <div class="stat-item"><div class="stat-value">Free</div><div class="stat-label">No hidden costs</div></div>
+      <div class="stat-item"><div class="stat-value">&lt;10 MB</div><div class="stat-label">Lightweight install</div></div>
+      <div class="stat-item"><div class="stat-value">0</div><div class="stat-label">Ads in the app</div></div>
+      <div class="stat-item"><div class="stat-value">∞</div><div class="stat-label">Sessions. No limits.</div></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container reveal">
+      <h2 class="cta-title">Start breathing better today</h2>
+      <p class="cta-subtitle">Download MEZR free on Google Play. No account required to begin.</p>
+      <a href="https://play.google.com/store/apps/details?id=com.mezrapp.mezr" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M3.609 1.814L13.792 12 3.609 22.186a2.372 2.372 0 0 1-.609-1.593V3.407c0-.607.222-1.16.609-1.593zm.921-.752L15.6 7.191l-2.889 2.889L4.53 1.062zM16.72 11.455l2.852 1.62c.485.275.785.765.785 1.28 0 .516-.3 1.006-.785 1.28l-2.852 1.62-3.166-3.166zM4.53 22.938l8.181-8.018 2.889 2.889L4.53 22.938z"/></svg>
+        Download on Google Play
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-left">
+        <span class="footer-logo">MEZR</span>
+        <ul class="footer-links">
+          <li><a href="https://mezr-app.github.io/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="mailto:support@mezr.app">Contact</a></li>
+        </ul>
+      </div>
+      <span class="footer-copy">&copy; 2025 MEZR. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    const nav=document.getElementById('nav');
+    window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>40);});
+
+    const revealEls=document.querySelectorAll('.reveal');
+    const revealObserver=new IntersectionObserver((entries)=>{
+      entries.forEach((entry,i)=>{if(entry.isIntersecting){setTimeout(()=>entry.target.classList.add('visible'),i*80);revealObserver.unobserve(entry.target);}});
+    },{threshold:0.15});
+    revealEls.forEach(el=>revealObserver.observe(el));
+
+    const demoVisual=document.getElementById('demoVisual');
+    for(let i=0;i<8;i++){
+      const angle=(i/8)*Math.PI*2-Math.PI/2;
+      const x=Math.cos(angle)*110, y=Math.sin(angle)*110;
+      const dot=document.createElement('div');
+      dot.className='demo-circle-secondary';
+      dot.style.setProperty('--x',x+'px');
+      dot.style.setProperty('--y',y+'px');
+      dot.style.left='calc(50% - 12px)';
+      dot.style.top='calc(50% - 12px)';
+      dot.style.transform=`translate(${x}px,${y}px)`;
+      demoVisual.appendChild(dot);
+    }
+
+    const demoLabel=document.getElementById('demoLabel');
+    const phases=['Inhale','Exhale'];
+    let pi=0;
+    demoLabel.style.transition='opacity 0.2s';
+    setInterval(()=>{pi=(pi+1)%2;demoLabel.style.opacity='0';setTimeout(()=>{demoLabel.textContent=phases[pi];demoLabel.style.opacity='1';},200);},2125);
+
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',(e)=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'});});});
+  </script>
+</body>
+</html>

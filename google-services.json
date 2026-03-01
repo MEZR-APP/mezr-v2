@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "861713438070",
+    "project_id": "mezr-5e2fd",
+    "storage_bucket": "mezr-5e2fd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861713438070:android:7ffce0cb02df77efe01657",
+        "android_client_info": {
+          "package_name": "com.ashok.mezr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcD_rCGomcV56DyijcuOR3JvM6A83VZjA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
