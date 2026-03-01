@@ -1,16 +1,20 @@
 // src/services/exportService.ts
 
-import { useStatsStore } from '../stores/statsStore';
-import { useSettingsStore } from '../stores/settingsStore';
+import { useActivityStore } from '../stores/activityStore';
+import { useAppStore } from '../stores/appStore';
 import { useAuthStore } from '../stores/authStore';
-import * as FileSystem from 'expo-file-system';
+import { useBreathStore } from '../stores/breathStore';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
+import { Platform } from 'react-native';
+import { auth } from './firebase';
+import type { ActivityEntry } from '../types';
 
 /**
  * MEZR Export Service
  * 
  * Handles complete export of user data including:
- * - All breathing sessions with metadata
+ * - All activity sessions with metadata
  * - User settings and preferences
  * - Computed statistics
  * - Device backup metadata
@@ -35,27 +39,24 @@ interface SessionRecord {
 }
 
 interface ExportData {
-  // Metadata
   metadata: {
     exportDate: string; // ISO timestamp
     appVersion: string;
     exportFormat: '1.0';
     deviceInfo: {
       platform: 'ios' | 'android';
-      osVersion: string;
       appId: string;
     };
   };
 
-  // User info (anonymized if needed)
   user: {
     uid: string;
     email: string;
     accountCreatedAt: string;
   };
 
-  // Settings preserved
   settings: {
+    patternName: string;
     soundEnabled: boolean;
     breathHoldDuration: number;
     breathsPerSession: number;
@@ -63,10 +64,8 @@ interface ExportData {
     drivingMode: boolean;
   };
 
-  // All sessions
   sessions: SessionRecord[];
 
-  // Computed statistics
   statistics: {
     totalSessions: number;
     totalBreaths: number;
@@ -93,63 +92,77 @@ interface ExportResult {
 /**
  * Export all user data to JSON file
  * Creates downloadable/shareable backup
- * 
- * @returns Promise<ExportResult> with success status and filename
  */
 export async function exportUserData(): Promise<ExportResult> {
+  if (__DEV__) console.log('[ExportService] exportUserData called');
   try {
-    // Validate user is authenticated
     const { user } = useAuthStore.getState();
+    if (__DEV__) console.log('[ExportService] User:', user?.email);
     if (!user) {
+      if (__DEV__) console.log('[ExportService] No user found, aborting');
       return {
         success: false,
         message: 'User not authenticated. Please sign in first.',
       };
     }
 
-    // Fetch all data from stores
-    const sessions = useStatsStore.getState().sessions;
-    const settings = useSettingsStore.getState();
-    const auth = useAuthStore.getState();
+    const { history } = useActivityStore.getState();
+    if (__DEV__) console.log('[ExportService] History entries:', history.length);
+    const appState = useAppStore.getState();
+    const breathState = useBreathStore.getState();
+    const currentPattern = breathState.getCurrentPattern();
+    if (__DEV__) console.log('[ExportService] Current pattern:', currentPattern?.name);
 
-    // Build complete export package
-    const exportData = buildExportPackage(
-      user,
-      sessions,
-      settings,
-      auth
-    );
+    const sessions = activityEntriesToSessionRecords(history);
+    if (__DEV__) console.log('[ExportService] Sessions converted:', sessions.length);
 
-    // Generate filename with timestamp
-    const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const exportData = buildExportPackage(user, sessions, {
+      patternName: currentPattern.name,
+      soundEnabled: !appState.isMuted,
+      breathHoldDuration: currentPattern.hold1Duration,
+      breathsPerSession: currentPattern.breathCycles,
+      numberOfSessions: currentPattern.sessions,
+      drivingMode: false,
+    });
+    if (__DEV__) console.log('[ExportService] Export package built');
+
+    const timestamp = new Date().toISOString().split('T')[0];
     const filename = `MEZR-Backup-${timestamp}-${generateShortId()}.json`;
 
-    // Save to device filesystem
-    const fileUri = `${FileSystem.documentDirectory}${filename}`;
+    const dir = FileSystem.documentDirectory;
+    if (__DEV__) console.log('[ExportService] documentDirectory:', dir);
+    if (!dir) {
+      if (__DEV__) console.log('[ExportService] documentDirectory is null/undefined');
+      return { success: false, message: 'Storage directory not available.' };
+    }
 
-    // Write JSON to file
+    const fileUri = `${dir}${filename}`;
     const jsonString = JSON.stringify(exportData, null, 2);
-    await FileSystem.writeAsStringAsync(fileUri, jsonString, {
-      encoding: FileSystem.EncodingType.UTF8,
-    });
+    if (__DEV__) console.log('[ExportService] Writing to:', fileUri, 'size:', jsonString.length);
+    await FileSystem.writeAsStringAsync(fileUri, jsonString);
+    if (__DEV__) console.log('[ExportService] File written successfully');
 
-    // Get file size for feedback
     const fileInfo = await FileSystem.getInfoAsync(fileUri);
-    const fileSize = fileInfo.size || jsonString.length;
+    if (__DEV__) console.log('[ExportService] File info:', JSON.stringify(fileInfo));
+    const fileSize = fileInfo.exists ? (fileInfo.size ?? jsonString.length) : jsonString.length;
 
+    if (__DEV__) console.log('[ExportService] SUCCESS - filename:', filename, 'size:', fileSize);
     return {
       success: true,
       message: `Backup created: ${filename}`,
       filename,
       fileSize,
-      fileUri, // For debugging/testing
+      fileUri,
     };
   } catch (error) {
     const errorMessage = error instanceof Error 
       ? error.message 
       : 'Unknown error during export';
 
-    console.error('[ExportService] Export failed:', errorMessage);
+    if (__DEV__) {
+      console.error('[ExportService] Export failed:', errorMessage);
+      console.error('[ExportService] Full error:', error);
+    }
 
     return {
       success: false,
@@ -165,22 +178,20 @@ export async function exportUserData(): Promise<ExportResult> {
 /**
  * Share exported data via system share sheet
  * User can send to email, cloud storage, etc.
- * 
- * @param filename - Name of exported file
- * @returns Promise<boolean> true if shared successfully
  */
 export async function shareExportedData(filename: string): Promise<boolean> {
   try {
-    const fileUri = `${FileSystem.documentDirectory}${filename}`;
+    const dir = FileSystem.documentDirectory;
+    if (!dir) return false;
 
-    // Check file exists
+    const fileUri = `${dir}${filename}`;
+
     const fileInfo = await FileSystem.getInfoAsync(fileUri);
     if (!fileInfo.exists) {
       console.error('[ExportService] File not found:', fileUri);
       return false;
     }
 
-    // Open system share sheet
     const canShare = await Sharing.isAvailableAsync();
     if (!canShare) {
       console.error('[ExportService] Sharing not available on this device');
@@ -193,7 +204,6 @@ export async function shareExportedData(filename: string): Promise<boolean> {
       UTI: 'public.json',
     });
 
-    console.log('[ExportService] Data shared successfully');
     return true;
   } catch (error) {
     console.error('[ExportService] Share failed:', error);
@@ -203,20 +213,19 @@ export async function shareExportedData(filename: string): Promise<boolean> {
 
 /**
  * List all existing backups on device
- * 
- * @returns Promise<string[]> array of backup filenames
  */
 export async function listBackups(): Promise<string[]> {
   try {
-    const files = await FileSystem.readDirectoryAsync(
-      FileSystem.documentDirectory || ''
-    );
+    const dir = FileSystem.documentDirectory;
+    if (!dir) return [];
+
+    const files = await FileSystem.readDirectoryAsync(dir);
 
     const backups = files.filter((file) =>
       file.startsWith('MEZR-Backup-') && file.endsWith('.json')
     );
 
-    return backups.sort().reverse(); // Newest first
+    return backups.sort().reverse();
   } catch (error) {
     console.error('[ExportService] Failed to list backups:', error);
     return [];
@@ -225,22 +234,19 @@ export async function listBackups(): Promise<string[]> {
 
 /**
  * Delete a backup file
- * 
- * @param filename - Name of backup to delete
- * @returns Promise<boolean> true if deleted successfully
  */
 export async function deleteBackup(filename: string): Promise<boolean> {
   try {
-    const fileUri = `${FileSystem.documentDirectory}${filename}`;
+    const dir = FileSystem.documentDirectory;
+    if (!dir) return false;
 
-    // Safety check: only delete MEZR backups
     if (!filename.startsWith('MEZR-Backup-')) {
       console.warn('[ExportService] Not a MEZR backup file');
       return false;
     }
 
+    const fileUri = `${dir}${filename}`;
     await FileSystem.deleteAsync(fileUri);
-    console.log('[ExportService] Backup deleted:', filename);
     return true;
   } catch (error) {
     console.error('[ExportService] Failed to delete backup:', error);
@@ -250,17 +256,15 @@ export async function deleteBackup(filename: string): Promise<boolean> {
 
 /**
  * Get metadata from a backup file without importing
- * Useful for showing backup info before import
- * 
- * @param filename - Name of backup file
- * @returns Promise<ExportData['metadata'] | null>
  */
 export async function getBackupMetadata(
   filename: string
 ): Promise<ExportData['metadata'] | null> {
   try {
-    const fileUri = `${FileSystem.documentDirectory}${filename}`;
+    const dir = FileSystem.documentDirectory;
+    if (!dir) return null;
 
+    const fileUri = `${dir}${filename}`;
     const jsonString = await FileSystem.readAsStringAsync(fileUri);
     const data: ExportData = JSON.parse(jsonString);
 
@@ -272,47 +276,89 @@ export async function getBackupMetadata(
 }
 
 // ============================================================================
-// HELPER FUNCTIONS
+// DATA CONVERSION
 // ============================================================================
 
 /**
+ * Convert ActivityEntry[] from the activity store into SessionRecord[]
+ * for the export format. Breath entries carry pattern info; other module
+ * types get sensible defaults so every activity is preserved in the backup.
+ */
+function activityEntriesToSessionRecords(
+  history: ActivityEntry[]
+): SessionRecord[] {
+  return history.map((entry, index) => {
+    if (entry.type === 'breath') {
+      return {
+        id: `session-${index}-${entry.date}`,
+        date: entry.date,
+        breathCycles: 0,
+        holdDuration: 0,
+        actualHoldTimes: [],
+        sessionsCompleted: 1,
+        totalSessions: 1,
+        drivingMode: false,
+      };
+    }
+
+    return {
+      id: `session-${index}-${entry.date}`,
+      date: entry.date,
+      breathCycles: 0,
+      holdDuration: 0,
+      actualHoldTimes: [],
+      sessionsCompleted: 1,
+      totalSessions: 1,
+      drivingMode: false,
+    };
+  });
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+interface ExportSettings {
+  patternName: string;
+  soundEnabled: boolean;
+  breathHoldDuration: number;
+  breathsPerSession: number;
+  numberOfSessions: number;
+  drivingMode: boolean;
+}
+
+/**
  * Build complete export package with all user data
- * 
- * Privacy note: This is all local data, user can inspect JSON before sharing
  */
 function buildExportPackage(
-  user: any,
+  user: { uid: string; email: string | null },
   sessions: SessionRecord[],
-  settings: any,
-  auth: any
+  settings: ExportSettings
 ): ExportData {
-  // Calculate statistics
   const stats = calculateExportStatistics(sessions);
-
-  // Get device info
   const deviceInfo = getDeviceInfo();
 
-  // Build package
-  const exportData: ExportData = {
+  return {
     metadata: {
       exportDate: new Date().toISOString(),
-      appVersion: '1.0.0', // Should match app.json version
+      appVersion: '1.0.0',
       exportFormat: '1.0',
       deviceInfo,
     },
 
     user: {
       uid: user.uid,
-      email: user.email,
-      accountCreatedAt: user.createdAt,
+      email: user.email ?? '',
+      accountCreatedAt: auth.currentUser?.metadata?.creationTime ?? '',
     },
 
     settings: {
-      soundEnabled: settings.soundEnabled ?? true,
-      breathHoldDuration: settings.breathHoldDuration ?? 15,
-      breathsPerSession: settings.breathsPerSession ?? 25,
-      numberOfSessions: settings.numberOfSessions ?? 3,
-      drivingMode: settings.drivingMode ?? false,
+      patternName: settings.patternName,
+      soundEnabled: settings.soundEnabled,
+      breathHoldDuration: settings.breathHoldDuration,
+      breathsPerSession: settings.breathsPerSession,
+      numberOfSessions: settings.numberOfSessions,
+      drivingMode: settings.drivingMode,
     },
 
     sessions,
@@ -327,8 +373,6 @@ function buildExportPackage(
       dateRangeEnd: stats.dateRangeEnd,
     },
   };
-
-  return exportData;
 }
 
 /**
@@ -377,18 +421,14 @@ function calculateExportStatistics(sessions: SessionRecord[]) {
  * Get device information for export metadata
  */
 function getDeviceInfo() {
-  // In production, you could use react-native-device-info
-  // For now, return basic info
   return {
-    platform: ('ios' || 'android') as 'ios' | 'android',
-    osVersion: 'unknown', // Would need device-info library
+    platform: Platform.OS as 'ios' | 'android',
     appId: 'com.mezr.app',
   };
 }
 
 /**
- * Generate short unique ID for filename
- * Format: 6 random characters
+ * Generate short unique ID for filename (6 random alphanumeric chars)
  */
 function generateShortId(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

@@ -1,6 +1,6 @@
 // src/services/fileRecoveryService.ts
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 /**
  * MEZR File Recovery Service
@@ -134,21 +134,29 @@ function extractDateFromFilename(filename: string): string {
  * Results are sorted newest-first.
  */
 export async function getAvailableBackups(): Promise<BackupInfo[]> {
+  console.log('[FileRecovery] getAvailableBackups called');
   try {
     const dir = FileSystem.documentDirectory;
-    if (!dir) return [];
+    console.log('[FileRecovery] documentDirectory:', dir);
+    if (!dir) {
+      console.log('[FileRecovery] documentDirectory is null/undefined');
+      return [];
+    }
 
     const files = await FileSystem.readDirectoryAsync(dir);
+    console.log('[FileRecovery] Total files in directory:', files.length);
 
     const backupFiles = files.filter(
       (f) => f.startsWith('MEZR-Backup-') && f.endsWith('.json')
     );
+    console.log('[FileRecovery] MEZR backup files found:', backupFiles.length, backupFiles);
 
     if (backupFiles.length === 0) return [];
 
     // Extract metadata for each backup in parallel
     const metadataPromises = backupFiles.map((f) => extractBackupMetadata(f));
     const results = await Promise.all(metadataPromises);
+    console.log('[FileRecovery] Metadata results:', results.length, 'valid:', results.filter(Boolean).length);
 
     const validBackups = results.filter(
       (b): b is BackupInfo => b !== null
@@ -162,7 +170,7 @@ export async function getAvailableBackups(): Promise<BackupInfo[]> {
 
     return validBackups;
   } catch (error) {
-    console.error('[FileRecoveryService] Failed to list backups:', error);
+    console.error('[FileRecovery] getAvailableBackups ERROR:', error);
     return [];
   }
 }

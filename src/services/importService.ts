@@ -1,6 +1,6 @@
 // src/services/importService.ts
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useActivityStore } from '../stores/activityStore';
 import { useAppStore } from '../stores/appStore';
 import { saveHistoryToStorage } from './storageService';
@@ -40,7 +40,6 @@ export interface ExportData {
     exportFormat: '1.0';
     deviceInfo: {
       platform: 'ios' | 'android';
-      osVersion: string;
       appId: string;
     };
   };
@@ -50,6 +49,7 @@ export interface ExportData {
     accountCreatedAt: string;
   };
   settings: {
+    patternName: string;
     soundEnabled: boolean;
     breathHoldDuration: number;
     breathsPerSession: number;

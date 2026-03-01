@@ -4,14 +4,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
   StyleSheet,
   Modal,
   ActivityIndicator,
   Switch,
 } from 'react-native';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { colors } from '../theme/colors';
 import { useAppStore } from '../stores/appStore';
 import {
@@ -68,15 +68,19 @@ export default function ImportModal({ visible, onClose }: Props) {
   }, [visible]);
 
   const loadBackupList = useCallback(async () => {
+    console.log('[ImportModal] loadBackupList called');
     setIsLoadingList(true);
     try {
+      console.log('[ImportModal] Calling getAvailableBackups...');
       const available = await getAvailableBackups();
+      console.log('[ImportModal] Backups found:', available.length, JSON.stringify(available));
       setBackups(available);
     } catch (err) {
-      console.error('[ImportModal] Failed to load backups:', err);
+      console.error('[ImportModal] loadBackupList ERROR:', err);
       setBackups([]);
     } finally {
       setIsLoadingList(false);
+      console.log('[ImportModal] loadBackupList finished');
     }
   }, []);
 
@@ -147,15 +151,15 @@ export default function ImportModal({ visible, onClose }: Props) {
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.card}>
+      <Pressable style={styles.overlay} onPress={onClose}>
+        <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
               {(state === 'preview' || state === 'error') && (
-                <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+                <Pressable onPress={handleBack} style={styles.backButton}>
                   <Text style={styles.backText}>←</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               <Text style={styles.title}>
                 {state === 'idle' && 'IMPORT BACKUP'}
@@ -165,20 +169,16 @@ export default function ImportModal({ visible, onClose }: Props) {
                 {state === 'error' && 'IMPORT FAILED'}
               </Text>
             </View>
-            <TouchableOpacity
+            <Pressable
               onPress={onClose}
               style={styles.closeButton}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              hitSlop={12}
             >
               <Text style={styles.closeText}>✕</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
-          <ScrollView
-            style={styles.body}
-            contentContainerStyle={styles.bodyContent}
-            showsVerticalScrollIndicator={false}
-          >
+          <View style={styles.bodyContent}>
             {/* ── IDLE: backup list ── */}
             {state === 'idle' && (
               <>
@@ -199,39 +199,44 @@ export default function ImportModal({ visible, onClose }: Props) {
                     </Text>
                   </View>
                 ) : (
-                  backups.map((backup) => (
-                    <TouchableOpacity
-                      key={backup.filename}
-                      style={styles.backupRow}
-                      onPress={() => handleSelectBackup(backup)}
-                      activeOpacity={0.7}
-                    >
-                      <View style={styles.backupInfo}>
-                        <Text style={styles.backupFilename} numberOfLines={1}>
-                          {backup.filename}
-                        </Text>
-                        <View style={styles.backupMeta}>
-                          <Text style={styles.backupMetaText}>
-                            {formatBackupDate(backup.exportDate)}
+                  <ScrollView
+                    style={{ maxHeight: 320 }}
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                  >
+                    {backups.map((backup) => (
+                      <Pressable
+                        key={backup.filename}
+                        style={styles.backupRow}
+                        onPress={() => handleSelectBackup(backup)}
+                      >
+                        <View style={styles.backupInfo}>
+                          <Text style={styles.backupFilename} numberOfLines={1}>
+                            {backup.filename}
                           </Text>
-                          <Text style={styles.backupMetaDot}>·</Text>
-                          <Text style={styles.backupMetaText}>
-                            {backup.sessionCount} sessions
-                          </Text>
-                          <Text style={styles.backupMetaDot}>·</Text>
-                          <Text style={styles.backupMetaText}>
-                            {formatFileSize(backup.backupSize)}
-                          </Text>
+                          <View style={styles.backupMeta}>
+                            <Text style={styles.backupMetaText}>
+                              {formatBackupDate(backup.exportDate)}
+                            </Text>
+                            <Text style={styles.backupMetaDot}>·</Text>
+                            <Text style={styles.backupMetaText}>
+                              {backup.sessionCount} sessions
+                            </Text>
+                            <Text style={styles.backupMetaDot}>·</Text>
+                            <Text style={styles.backupMetaText}>
+                              {formatFileSize(backup.backupSize)}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
-                      {backup.isRecent && (
-                        <View style={styles.recentBadge}>
-                          <Text style={styles.recentBadgeText}>RECENT</Text>
-                        </View>
-                      )}
-                      <Text style={styles.chevron}>→</Text>
-                    </TouchableOpacity>
-                  ))
+                        {backup.isRecent && (
+                          <View style={styles.recentBadge}>
+                            <Text style={styles.recentBadgeText}>RECENT</Text>
+                          </View>
+                        )}
+                        <Text style={styles.chevron}>→</Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
                 )}
               </>
             )}
@@ -246,62 +251,68 @@ export default function ImportModal({ visible, onClose }: Props) {
                   </View>
                 ) : (
                   <>
-                    <Text style={styles.sectionLabel}>BACKUP DETAILS</Text>
-                    <View style={styles.detailCard}>
-                      <DetailRow
-                        label="File"
-                        value={selectedBackup.filename}
-                        mono
-                      />
-                      <DetailRow
-                        label="Created"
-                        value={formatBackupDate(selectedBackup.exportDate)}
-                      />
-                      <DetailRow
-                        label="Sessions"
-                        value={String(selectedBackup.sessionCount)}
-                      />
-                      <DetailRow
-                        label="Size"
-                        value={formatFileSize(selectedBackup.backupSize)}
-                      />
-                      {previewData?.metadata?.appVersion && (
+                    <ScrollView
+                      style={{ maxHeight: 240 }}
+                      keyboardShouldPersistTaps="handled"
+                      showsVerticalScrollIndicator={false}
+                    >
+                      <Text style={styles.sectionLabel}>BACKUP DETAILS</Text>
+                      <View style={styles.detailCard}>
                         <DetailRow
-                          label="App version"
-                          value={previewData.metadata.appVersion}
+                          label="File"
+                          value={selectedBackup.filename}
+                          mono
                         />
-                      )}
-                      {previewData?.statistics?.dateRangeStart && (
                         <DetailRow
-                          label="Date range"
-                          value={`${formatShortDate(previewData.statistics.dateRangeStart)} – ${formatShortDate(previewData.statistics.dateRangeEnd ?? '')}`}
+                          label="Created"
+                          value={formatBackupDate(selectedBackup.exportDate)}
                         />
-                      )}
-                    </View>
+                        <DetailRow
+                          label="Sessions"
+                          value={String(selectedBackup.sessionCount)}
+                        />
+                        <DetailRow
+                          label="Size"
+                          value={formatFileSize(selectedBackup.backupSize)}
+                        />
+                        {previewData?.metadata?.appVersion && (
+                          <DetailRow
+                            label="App version"
+                            value={previewData.metadata.appVersion}
+                          />
+                        )}
+                        {previewData?.statistics?.dateRangeStart && (
+                          <DetailRow
+                            label="Date range"
+                            value={`${formatShortDate(previewData.statistics.dateRangeStart)} – ${formatShortDate(previewData.statistics.dateRangeEnd ?? '')}`}
+                          />
+                        )}
+                      </View>
 
-                    {previewData?.settings && (
-                      <>
-                        <Text style={styles.sectionLabel}>SETTINGS IN BACKUP</Text>
-                        <View style={styles.detailCard}>
-                          <DetailRow
-                            label="Sound"
-                            value={previewData.settings.soundEnabled ? 'On' : 'Off'}
-                          />
-                          <DetailRow
-                            label="Hold duration"
-                            value={`${previewData.settings.breathHoldDuration}s`}
-                          />
-                          <DetailRow
-                            label="Breaths/session"
-                            value={String(previewData.settings.breathsPerSession)}
-                          />
-                          <DetailRow
-                            label="Sessions"
-                            value={String(previewData.settings.numberOfSessions)}
-                          />
-                        </View>
-                      </>
-                    )}
+                      {previewData?.settings && (
+                        <>
+                          <Text style={styles.sectionLabel}>SETTINGS IN BACKUP</Text>
+                          <View style={styles.detailCard}>
+                            <DetailRow
+                              label="Sound"
+                              value={previewData.settings.soundEnabled ? 'On' : 'Off'}
+                            />
+                            <DetailRow
+                              label="Hold duration"
+                              value={`${previewData.settings.breathHoldDuration}s`}
+                            />
+                            <DetailRow
+                              label="Breaths/session"
+                              value={String(previewData.settings.breathsPerSession)}
+                            />
+                            <DetailRow
+                              label="Sessions"
+                              value={String(previewData.settings.numberOfSessions)}
+                            />
+                          </View>
+                        </>
+                      )}
+                    </ScrollView>
 
                     <Text style={styles.sectionLabel}>CONFLICT RESOLUTION</Text>
                     <View style={styles.toggleRow}>
@@ -335,7 +346,7 @@ export default function ImportModal({ visible, onClose }: Props) {
                       </View>
                     )}
 
-                    <TouchableOpacity
+                    <Pressable
                       style={[
                         styles.primaryButton,
                         !mergeMode && styles.dangerButton,
@@ -350,7 +361,7 @@ export default function ImportModal({ visible, onClose }: Props) {
                       >
                         {mergeMode ? 'IMPORT & MERGE' : 'REPLACE ALL DATA'}
                       </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   </>
                 )}
               </>
@@ -382,9 +393,9 @@ export default function ImportModal({ visible, onClose }: Props) {
                   </Text>
                 </View>
 
-                <TouchableOpacity style={styles.primaryButton} onPress={handleDone}>
+                <Pressable style={styles.primaryButton} onPress={handleDone}>
                   <Text style={styles.primaryButtonText}>DONE</Text>
-                </TouchableOpacity>
+                </Pressable>
               </>
             )}
 
@@ -397,18 +408,18 @@ export default function ImportModal({ visible, onClose }: Props) {
                   <Text style={styles.errorText}>{errorMessage}</Text>
                 </View>
 
-                <TouchableOpacity style={styles.primaryButton} onPress={handleBack}>
+                <Pressable style={styles.primaryButton} onPress={handleBack}>
                   <Text style={styles.primaryButtonText}>TRY ANOTHER BACKUP</Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity style={styles.secondaryButton} onPress={handleDone}>
+                <Pressable style={styles.secondaryButton} onPress={handleDone}>
                   <Text style={styles.secondaryButtonText}>CLOSE</Text>
-                </TouchableOpacity>
+                </Pressable>
               </>
             )}
-          </ScrollView>
-        </View>
-      </View>
+          </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }
@@ -473,7 +484,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.inputBorder,
-    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
@@ -510,9 +520,6 @@ const styles = StyleSheet.create({
   closeText: {
     color: colors.textMuted,
     fontSize: 16,
-  },
-  body: {
-    flex: 1,
   },
   bodyContent: {
     padding: 20,

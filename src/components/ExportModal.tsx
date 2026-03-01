@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
   StyleSheet,
   Modal,
@@ -68,11 +68,14 @@ export default function ExportModal({ visible, onClose }: Props) {
   }, [visible]);
 
   const handleExport = useCallback(async () => {
+    console.log('[ExportModal] handleExport clicked');
     setState('exporting');
     setErrorMessage('');
 
     try {
+      console.log('[ExportModal] Calling exportUserData...');
       const result = await exportUserData();
+      console.log('[ExportModal] Export result:', JSON.stringify(result));
 
       if (result.success && result.filename) {
         setState('success');
@@ -81,15 +84,16 @@ export default function ExportModal({ visible, onClose }: Props) {
         invalidateCache();
         showToast('Backup created successfully');
       } else {
+        console.log('[ExportModal] Export not successful:', result.message);
         setState('error');
         setErrorMessage(result.message || 'Export failed unexpectedly.');
       }
     } catch (err) {
+      console.error('[ExportModal] Export CATCH error:', err);
       setState('error');
       setErrorMessage(
         err instanceof Error ? err.message : 'An unexpected error occurred.'
       );
-      console.error('[ExportModal] Export error:', err);
     }
   }, [showToast]);
 
@@ -146,25 +150,21 @@ export default function ExportModal({ visible, onClose }: Props) {
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.card}>
+      <Pressable style={styles.overlay} onPress={onClose}>
+        <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>EXPORT DATA</Text>
-            <TouchableOpacity
+            <Pressable
               onPress={onClose}
               style={styles.closeButton}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              hitSlop={12}
             >
               <Text style={styles.closeText}>✕</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
-          <ScrollView
-            style={styles.body}
-            contentContainerStyle={styles.bodyContent}
-            showsVerticalScrollIndicator={false}
-          >
+          <View style={styles.bodyContent}>
             {/* ── IDLE STATE ── */}
             {state === 'idle' && (
               <>
@@ -175,18 +175,15 @@ export default function ExportModal({ visible, onClose }: Props) {
                   <SummaryRow label="Estimated size" value={estimatedSize} />
                 </View>
 
-                <TouchableOpacity style={styles.primaryButton} onPress={handleExport}>
+                <Pressable style={styles.primaryButton} onPress={handleExport}>
                   <Text style={styles.primaryButtonText}>EXPORT NOW</Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity
-                  style={styles.secondaryButton}
-                  onPress={handleShowBackups}
-                >
+                <Pressable style={styles.secondaryButton} onPress={handleShowBackups}>
                   <Text style={styles.secondaryButtonText}>
                     VIEW EXISTING BACKUPS
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </>
             )}
 
@@ -215,7 +212,7 @@ export default function ExportModal({ visible, onClose }: Props) {
                   )}
                 </View>
 
-                <TouchableOpacity
+                <Pressable
                   style={styles.primaryButton}
                   onPress={handleShare}
                   disabled={isSharing}
@@ -225,11 +222,11 @@ export default function ExportModal({ visible, onClose }: Props) {
                   ) : (
                     <Text style={styles.primaryButtonText}>SHARE</Text>
                   )}
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity style={styles.secondaryButton} onPress={handleDone}>
+                <Pressable style={styles.secondaryButton} onPress={handleDone}>
                   <Text style={styles.secondaryButtonText}>DONE</Text>
-                </TouchableOpacity>
+                </Pressable>
               </>
             )}
 
@@ -242,19 +239,19 @@ export default function ExportModal({ visible, onClose }: Props) {
                   <Text style={styles.errorText}>{errorMessage}</Text>
                 </View>
 
-                <TouchableOpacity style={styles.primaryButton} onPress={handleRetry}>
+                <Pressable style={styles.primaryButton} onPress={handleRetry}>
                   <Text style={styles.primaryButtonText}>TRY AGAIN</Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity style={styles.secondaryButton} onPress={handleDone}>
+                <Pressable style={styles.secondaryButton} onPress={handleDone}>
                   <Text style={styles.secondaryButtonText}>CLOSE</Text>
-                </TouchableOpacity>
+                </Pressable>
               </>
             )}
 
             {/* ── BACKUP LIST (expandable in idle state) ── */}
             {showBackupList && (
-              <>
+              <ScrollView style={{ maxHeight: 200 }} keyboardShouldPersistTaps="handled">
                 <Text style={[styles.sectionLabel, { marginTop: 24 }]}>
                   EXISTING BACKUPS
                 </Text>
@@ -271,20 +268,20 @@ export default function ExportModal({ visible, onClose }: Props) {
                           {extractDisplayDate(filename)}
                         </Text>
                       </View>
-                      <TouchableOpacity
+                      <Pressable
                         style={styles.deleteButton}
                         onPress={() => handleDeleteBackup(filename)}
                       >
                         <Text style={styles.deleteButtonText}>DELETE</Text>
-                      </TouchableOpacity>
+                      </Pressable>
                     </View>
                   ))
                 )}
-              </>
+              </ScrollView>
             )}
-          </ScrollView>
-        </View>
-      </View>
+          </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }
@@ -367,7 +364,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.inputBorder,
-    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
