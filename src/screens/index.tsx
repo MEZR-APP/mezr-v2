@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Home, BarChart3, Settings, User } from 'lucide-react-native';
+import { Home, BarChart3, CalendarDays, Settings, User } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { useAppStore } from '../stores/appStore';
 import { useBreathStore } from '../stores/breathStore';
@@ -31,6 +31,7 @@ const TAB_INACTIVE_COLOR = '#666666';
 import { BreathModule } from '../components/modules/BreathModule';
 import { SwimModule } from '../components/modules/SwimModule';
 import { MeditateModule } from '../components/modules/MeditateModule';
+import TimelineScreen from '../components/TimelineScreen';
 export default function MainScreen() {
   // App Store
   const currentModule = useAppStore((state) => state.currentModule);
@@ -190,6 +191,7 @@ export default function MainScreen() {
         </>
       )}
       {currentTab === 'stats' && <StatsScreen />}
+      {currentTab === 'timeline' && <TimelineScreen />}
       {currentTab === 'settings' && <SettingsScreen {...settingsScreenProps} />}
       {currentTab === 'profile' && <ProfileScreen />}
 
@@ -226,6 +228,16 @@ function TabBar({
         <BarChart3
           size={TAB_ICON_SIZE}
           color={currentTab === 'stats' ? TAB_ACTIVE_COLOR : TAB_INACTIVE_COLOR}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={tabBarStyles.tab}
+        onPress={() => setCurrentTab('timeline')}
+        activeOpacity={0.7}
+      >
+        <CalendarDays
+          size={TAB_ICON_SIZE}
+          color={currentTab === 'timeline' ? TAB_ACTIVE_COLOR : TAB_INACTIVE_COLOR}
         />
       </TouchableOpacity>
       <TouchableOpacity
