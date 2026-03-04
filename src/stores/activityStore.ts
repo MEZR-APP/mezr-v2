@@ -14,6 +14,7 @@ import {
 import { db } from '../services/firebase';
 import { useAppStore } from './appStore';
 import { useAuthStore } from './authStore';
+import useTimelineStore from './timelineStore';
 
 // ============================================
 // STORE INTERFACE
@@ -77,6 +78,14 @@ export const useActivityStore = create<ActivityStore>((set, get) => ({
       } catch (err) {
         console.error('Cloud sync error:', err);
       }
+    }
+
+    /** D008: Auto-log completed session to the timeline. Fire-and-forget so
+     *  a timeline failure never breaks the core activity logging flow. */
+    try {
+      useTimelineStore.getState().autoLogActivity(newEntry).catch(() => {});
+    } catch {
+      // Timeline integration failure is silently ignored
     }
   },
   
