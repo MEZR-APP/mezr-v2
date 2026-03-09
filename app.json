@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MEZR",
-    "slug": "mezr",
+    "slug": "mezr-v2",
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./src/assets/app-icon.png",
