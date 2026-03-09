@@ -1,32 +1,32 @@
 {
   "expo": {
-    "name": "mezr-v2",
-    "slug": "mezr-v2",
+    "name": "MEZR",
+    "slug": "mezr",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/app-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./src/assets/app-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ashok.mezr"
+      "bundleIdentifier": "com.mezr.app"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./src/assets/app-icon.png",
+        "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.ashok.mezr"
+      "package": "com.mezr.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/assets/app-icon.png"
     },
     "extra": {
       "eas": {
