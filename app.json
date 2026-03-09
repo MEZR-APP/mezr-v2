@@ -2,7 +2,7 @@
   "expo": {
     "name": "MEZR",
     "slug": "mezr",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./src/assets/app-icon.png",
     "userInterfaceStyle": "light",
@@ -14,9 +14,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mezr.app"
+      "bundleIdentifier": "com.mezr.app",
+      "buildNumber": "4"
     },
     "android": {
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/app-icon.png",
         "backgroundColor": "#000000"
