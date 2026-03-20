@@ -1,37 +1,37 @@
 {
-  "expo": {
-    "name": "mezr-v2",
-    "slug": "mezr-v2",
-    "version": "1.0.1",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.ashok.mezr"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.ashok.mezr"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "75ed59dc-73ba-41c1-82b6-6439d2167680"
-      }
-    }
-  }
+    "expo":  {
+                 "name":  "mezr-v2",
+                 "slug":  "mezr-v2",
+                 "version":  "1.0.1",
+                 "orientation":  "portrait",
+                 "icon":  "./assets/icon.png",
+                 "userInterfaceStyle":  "light",
+                 "newArchEnabled":  true,
+                 "splash":  {
+                                "image":  "./assets/splash-icon.png",
+                                "resizeMode":  "contain",
+                                "backgroundColor":  "#ffffff"
+                            },
+                 "ios":  {
+                             "supportsTablet":  true,
+                             "bundleIdentifier":  "com.ashok.mezr"
+                         },
+                 "android":  {
+                                 "adaptiveIcon":  {
+                                                      "foregroundImage":  "./assets/adaptive-icon.png",
+                                                      "backgroundColor":  "#ffffff"
+                                                  },
+                                 "edgeToEdgeEnabled":  true,
+                                 "predictiveBackGestureEnabled":  false,
+                                 "package":  "com.ashok.mezr"
+                             },
+                 "web":  {
+                             "favicon":  "./assets/favicon.png"
+                         },
+                 "extra":  {
+                               "eas":  {
+                                           "projectId":  "75ed59dc-73ba-41c1-82b6-6439d2167680"
+                                       }
+                           }
+             }
 }
