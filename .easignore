@@ -1,0 +1,4 @@
+websites/
+.gitignore
+.env.local
+.DS_Store
