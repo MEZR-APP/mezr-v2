@@ -53,3 +53,5 @@ assets/
 # Credentials
 credentials.json
 mezr-key.jks
+# Cursor
+.claude/
