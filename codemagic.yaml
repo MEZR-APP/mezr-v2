@@ -1,0 +1,20 @@
+workflows:
+  android-eas-production:
+    name: mezr-v2 Android Play Store (EAS)
+    max_build_duration: 120
+    environment:
+      groups:
+        - expo
+      node: 18
+    cache:
+      cache_paths:
+        - $HOME/.npm
+        - $CM_BUILD_DIR/node_modules
+    scripts:
+      - name: Install npm dependencies
+        script: npm ci
+      - name: EAS build Android production
+        script: npx --yes eas-cli@18 build --platform android --profile production --non-interactive
+    artifacts:
+      - "*.aab"
+      - "**/*.aab"
