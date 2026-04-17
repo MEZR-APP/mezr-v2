@@ -35,6 +35,12 @@ const preloadedSounds: Partial<Record<BreathSoundName, Audio.Sound>> = {};
 /**
  * Initialize audio mode for the app.
  * Call this once when the app starts.
+ *
+ * `staysActiveInBackground` stays **false** on purpose: Apple Guideline 2.5.4
+ * requires that apps only declare `UIBackgroundModes` → `audio` if reviewers
+ * can hear ongoing audible content while the app is backgrounded (e.g. music /
+ * streaming). Short in-session cues are foreground use; do not add background
+ * audio to Info.plist unless that behavior is implemented and testable.
  */
 export const initializeAudio = async (): Promise<void> => {
   try {

@@ -1,29 +1,41 @@
 {
-    "expo":  {
-                 "name":  "mezr-v2",
-                 "slug":  "mezr-v2",
-                 "version":  "1.0.1",
-                 "orientation":  "portrait",
-                 "userInterfaceStyle":  "light",
-                 "newArchEnabled":  true,
-                 "ios":  {
-                             "supportsTablet":  true,
-                             "bundleIdentifier":  "com.ashok.mezr"
-                         },
-                 "android":  {
-                                 "adaptiveIcon":  {
-                                                      "backgroundColor":  "#ffffff"
-                                                  },
-                                 "edgeToEdgeEnabled":  true,
-                                 "predictiveBackGestureEnabled":  false,
-                                 "package":  "com.ashok.mezr"
-                             },
-                 "web":  {
-                         },
-                 "extra":  {
-                               "eas":  {
-                                           "projectId":  "75ed59dc-73ba-41c1-82b6-6439d2167680"
-                                       }
-                           }
-             }
+  "expo": {
+    "name": "MEZR",
+    "slug": "mezr-v2",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./src/assets/app-icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./src/assets/app-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mezr.app",
+      "infoPlist": {
+        "NSMotionUsageDescription": "MEZR uses motion data to detect and enhance your breathing exercises.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/app-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.ashok.mezr"
+    },
+    "web": {
+      "favicon": "./src/assets/app-icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "75ed59dc-73ba-41c1-82b6-6439d2167680"
+      }
+    }
+  }
 }

@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Home, BarChart3, Settings, User } from 'lucide-react-native';
+import { Home, BarChart3, Settings, User, Activity } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { useAppStore } from '../stores/appStore';
 import { useBreathStore } from '../stores/breathStore';
@@ -19,11 +19,23 @@ import { Toast } from '../components/ui/Toast';
 import { CategoryBar } from '../components/CategoryBar';
 import { ModulePicker } from '../components/ModulePicker';
 import { SettingsScreen } from '../components/SettingsScreen';
+import { QuickEntryBar } from '../components/QuickEntryBar';
 import PrivacyDashboard from './PrivacyDashboard';
 import PrivacyPolicy from './PrivacyPolicy';
 import StatsScreen from './StatsScreen';
 import ProfileScreen from './ProfileScreen';
+import TimelineScreen from './TimelineScreen';
+import { useTaskStore, getElapsedMs } from '../stores/taskStore';
+import {
+  initializeNotifications,
+  setupNotificationHandlers,
+  updatePersistentNotification,
+  dismissPersistentNotification,
+  loadQuickPresets,
+  setupBackgroundNotificationHandler,
+} from '../services/notificationService';
 import type { MainTabId } from '../stores/appStore';
+import type { NotificationAction } from '../services/notificationService';
 
 const TAB_ICON_SIZE = 24;
 const TAB_ACTIVE_COLOR = '#FFFFFF';
@@ -69,13 +81,99 @@ export default function MainScreen() {
 
   const setCloudBackupEnabled = useAppStore((state) => state.setCloudBackupEnabled);
 
+  // Task store
+  const loadTasks = useTaskStore((state) => state.loadTasks);
+  const activeTask = useTaskStore((state) => state.activeTask);
+  const pauseTask = useTaskStore((state) => state.pauseTask);
+  const resumeTask = useTaskStore((state) => state.resumeTask);
+  const stopTask = useTaskStore((state) => state.stopTask);
+  const startTask = useTaskStore((state) => state.startTask);
+
+  // Local state for notification sync
+  const [notifTick, setNotifTick] = useState(0); // Ticker to update notification every second
+  const [unsubscribeNotifications, setUnsubscribeNotifications] = useState<(() => void) | null>(null);
+
+  // Handle notification actions (pause, stop, quick start)
+  const handleNotificationAction = (action: NotificationAction) => {
+    switch (action.type) {
+      case 'pause_task':
+        pauseTask();
+        break;
+      case 'resume_task':
+        resumeTask();
+        break;
+      case 'stop_task':
+        stopTask();
+        break;
+      case 'start_task':
+        if (action.taskName) {
+          startTask(action.taskName);
+        }
+        break;
+      case 'open_app':
+        // Just open the app — already open, so navigate to timeline tab
+        setCurrentTab('timeline');
+        break;
+    }
+  };
+
   // Initialize on mount (PR-007: Load cloud backup preference - default OFF)
   useEffect(() => {
-    initializeAudio().then(() => preloadSounds());
-    loadPatterns();
-    loadHistory();
-    loadCloudBackupEnabled().then((enabled) => setCloudBackupEnabled(enabled));
-  }, [setCloudBackupEnabled]);
+    (async () => {
+      initializeAudio().then(() => preloadSounds());
+      loadPatterns();
+      loadHistory();
+      loadTasks();
+      loadCloudBackupEnabled().then((enabled) => setCloudBackupEnabled(enabled));
+
+      // Initialize notifications
+      const notifGranted = await initializeNotifications();
+      setupBackgroundNotificationHandler();
+
+      if (notifGranted) {
+        // Set up notification listeners
+        const unsub = setupNotificationHandlers(handleNotificationAction);
+        setUnsubscribeNotifications(() => unsub);
+
+        // Load quick presets for notifications
+        await loadQuickPresets();
+      }
+    })();
+  }, [setCloudBackupEnabled, loadTasks]);
+
+  // Update persistent notification every second when task is running
+  useEffect(() => {
+    if (!activeTask) return;
+
+    const elapsed = getElapsedMs(activeTask);
+    updatePersistentNotification(activeTask, elapsed);
+
+    // Set up ticker to update every second
+    const ticker = setInterval(() => {
+      setNotifTick((t) => t + 1);
+    }, 1000);
+
+    return () => clearInterval(ticker);
+  }, [activeTask, notifTick]);
+
+  // Update notification when tick changes
+  useEffect(() => {
+    if (!activeTask) {
+      updatePersistentNotification(null, 0);
+      return;
+    }
+    const elapsed = getElapsedMs(activeTask);
+    updatePersistentNotification(activeTask, elapsed);
+  }, [notifTick, activeTask]);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (unsubscribeNotifications) {
+        unsubscribeNotifications();
+      }
+    };
+  }, [unsubscribeNotifications]);
 
   // Reset all state
   const resetAll = () => {
@@ -126,6 +224,9 @@ export default function MainScreen() {
 
   return (
     <View style={styles.container}>
+      {/* QuickEntryBar — always visible at top, notification-bar style */}
+      <QuickEntryBar />
+
       {/* Tab content section - currentTab state controls which screen displays */}
       {currentTab === 'main' && (
         <>
@@ -189,6 +290,7 @@ export default function MainScreen() {
           </View>
         </>
       )}
+      {currentTab === 'timeline' && <TimelineScreen />}
       {currentTab === 'stats' && <StatsScreen />}
       {currentTab === 'settings' && <SettingsScreen {...settingsScreenProps} />}
       {currentTab === 'profile' && <ProfileScreen />}
@@ -216,6 +318,16 @@ function TabBar({
         <Home
           size={TAB_ICON_SIZE}
           color={currentTab === 'main' ? TAB_ACTIVE_COLOR : TAB_INACTIVE_COLOR}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={tabBarStyles.tab}
+        onPress={() => setCurrentTab('timeline')}
+        activeOpacity={0.7}
+      >
+        <Activity
+          size={TAB_ICON_SIZE}
+          color={currentTab === 'timeline' ? TAB_ACTIVE_COLOR : TAB_INACTIVE_COLOR}
         />
       </TouchableOpacity>
       <TouchableOpacity
