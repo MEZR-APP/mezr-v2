@@ -1,20 +1,24 @@
 {
   "expo": {
-    "name": "mezr-v2",
+    "name": "MEZR",
     "slug": "mezr-v2",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/app-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./src/assets/app-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ashok.mezr"
+      "bundleIdentifier": "com.mezr.app",
+      "infoPlist": {
+        "NSMotionUsageDescription": "MEZR uses motion data to detect and enhance your breathing exercises.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
