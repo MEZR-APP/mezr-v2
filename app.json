@@ -15,20 +15,22 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mezr.app",
-      "buildNumber": "4"
+      "infoPlist": {
+        "NSMotionUsageDescription": "MEZR uses motion data to detect and enhance your breathing exercises.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
-      "versionCode": 4,
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/app-icon.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.mezr.app"
+      "package": "com.ashok.mezr"
     },
     "web": {
-      "favicon": "./src/assets/app-icon.png"
+      "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
