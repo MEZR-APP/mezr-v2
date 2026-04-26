@@ -39,56 +39,8 @@ workflows:
           cat /tmp/eas-build-output.txt
       - name: Submit to Google Play
         script: |
-          # Extract the artifact URL from EAS build output
-          AAB_URL=$(grep -oE 'https://expo.dev/artifacts/eas/[^[:space:]]+\.aab' /tmp/eas-build-output.txt | head -1)
-
-          if [ -z "$AAB_URL" ]; then
-            echo "Could not find AAB URL in EAS build output"
-            cat /tmp/eas-build-output.txt
-            exit 1
-          fi
-
-          echo "Found AAB URL: $AAB_URL"
-
-          # Download the .aab file
-          AAB_FILE="/tmp/app.aab"
-          echo "Downloading AAB from EAS..."
-          curl -o "$AAB_FILE" "$AAB_URL"
-
-          if [ ! -f "$AAB_FILE" ]; then
-            echo "Failed to download AAB"
-            exit 1
-          fi
-
-          echo "AAB downloaded successfully: $(ls -lh $AAB_FILE)"
-
-          # Save service account credentials
-          echo "$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS" > /tmp/service-account.json
-
-          # Install bundletool
-          echo "Installing bundletool..."
-          npm install -g @google/bundletool --force
-
-          # Submit to Google Play using bundletool
-          echo "Submitting to Google Play..."
-          bundletool upload-apks \
-            --bundle="$AAB_FILE" \
-            --service-account-json=/tmp/service-account.json \
-            --package-name="com.ashok.mezr" \
-            --release-notes="Version 1.0.2 - Audio background mode fix (Guideline 2.5.4)" \
-            --track=internal
-
-          SUBMIT_STATUS=$?
-
-          # Cleanup
-          rm -f /tmp/service-account.json /tmp/eas-build-output.txt "$AAB_FILE"
-
-          if [ $SUBMIT_STATUS -eq 0 ]; then
-            echo "✅ Successfully submitted to Google Play internal testing track"
-          else
-            echo "❌ Submission failed with status $SUBMIT_STATUS"
-            exit 1
-          fi
+          echo "Submitting to Google Play using EAS submit..."
+          npx --yes eas-cli@latest submit --platform android --profile production --non-interactive
     artifacts:
       - "*.aab"
       - "**/*.aab"
