@@ -40,7 +40,7 @@ workflows:
       - name: Submit to Google Play
         script: |
           echo "Submitting to Google Play using EAS submit..."
-          npx --yes eas-cli@latest submit --platform android --profile production --non-interactive
+          npx --yes eas-cli@latest submit --platform android --profile production --latest --non-interactive
     artifacts:
       - "*.aab"
       - "**/*.aab"
