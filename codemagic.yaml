@@ -37,7 +37,45 @@ workflows:
         script: npx --yes eas-cli@18 build --platform android --profile production --non-interactive
       - name: Submit to Google Play
         script: |
-          npx --yes eas-cli@latest submit --platform android --profile production --non-interactive
+          # Save service account credentials
+          echo "$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS" > /tmp/service-account.json
+
+          # Get the latest .aab file
+          AAB_FILE=$(find . -name "*.aab" -type f | sort -V | tail -1)
+          if [ -z "$AAB_FILE" ]; then
+            echo "No .aab file found"
+            exit 1
+          fi
+
+          echo "Submitting $AAB_FILE to Google Play..."
+
+          # Install fastlane
+          sudo gem install fastlane -NV
+
+          # Create fastlane configuration
+          mkdir -p fastlane
+          cat > fastlane/Fastfile << 'FASTFILE'
+          default_platform(:android)
+
+          platform :android do
+            desc "Upload to Google Play internal testing"
+            lane :internal_testing do |options|
+              upload_to_play_store(
+                package_name: "com.ashok.mezr",
+                json_key: "/tmp/service-account.json",
+                aab: options[:aab_path],
+                track: "internal",
+                release_status: "draft"
+              )
+            end
+          end
+          FASTFILE
+
+          # Run fastlane
+          cd . && fastlane android internal_testing aab_path:"$AAB_FILE"
+
+          # Cleanup
+          rm -f /tmp/service-account.json
     artifacts:
       - "*.aab"
       - "**/*.aab"
