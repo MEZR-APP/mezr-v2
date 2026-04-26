@@ -35,29 +35,21 @@ workflows:
         script: npm install
       - name: EAS build Android production
         script: npx --yes eas-cli@18 build --platform android --profile production --non-interactive
-      - name: Submit to Google Play
+      - name: Debug - Find AAB location
         script: |
-          # Save service account credentials
-          echo "$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS" > $CM_BUILD_DIR/service-account.json
-
-          # Use EAS submit to automatically submit the build that was just created
-          # This automatically handles finding and submitting the artifact to Google Play
-          echo "Submitting build to Google Play internal testing track..."
-
-          # Set up EAS credentials via environment
-          export EAS_BUILD_PROFILE=production
-
-          # Run EAS submit for Android
-          npx --yes eas-cli@latest submit \
-            --platform android \
-            --profile production \
-            --track internal \
-            --use-service-account \
-            --service-account-key-path=$CM_BUILD_DIR/service-account.json \
-            --non-interactive || echo "Note: EAS submit submission initiated"
-
-          # Cleanup
-          rm -f $CM_BUILD_DIR/service-account.json
+          echo "=== Debug Info ==="
+          echo "CM_BUILD_DIR: $CM_BUILD_DIR"
+          echo "PWD: $(pwd)"
+          echo ""
+          echo "=== Searching for .aab files ==="
+          find $CM_BUILD_DIR -name "*.aab" -type f 2>/dev/null || echo "No .aab found in CM_BUILD_DIR"
+          find . -name "*.aab" -type f 2>/dev/null || echo "No .aab found in current dir"
+          echo ""
+          echo "=== EAS artifacts ==="
+          ls -la /tmp/eas-build-artifacts* 2>/dev/null || echo "No EAS artifacts in /tmp"
+          echo ""
+          echo "=== All environment variables ==="
+          env | grep -i eas || echo "No EAS env vars"
     artifacts:
       - "*.aab"
       - "**/*.aab"
