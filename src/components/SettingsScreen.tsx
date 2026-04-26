@@ -12,8 +12,6 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { colors } from '../theme/colors';
 import { useAppStore } from '../stores/appStore';
@@ -155,18 +153,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       <PatternBuilder />
       <DeleteConfirmModal />
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        enabled
-      >
-      <ScrollView
-        contentContainerStyle={styles.settingsScroll}
-        scrollEnabled={true}
-        nestedScrollEnabled={true}
-        keyboardDismissMode="interactive"
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={styles.settingsScroll}>
         <Text style={styles.settingsTitle}>
           MODULE: {currentModule === 'breath' ? 'BREATHING 🫁' : currentModule.toUpperCase()}
         </Text>
@@ -412,7 +399,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           <Text style={styles.buttonText}>DONE</Text>
         </TouchableOpacity>
       </ScrollView>
-      </KeyboardAvoidingView>
     </View>
   );
 };

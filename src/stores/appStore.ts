@@ -11,7 +11,7 @@ import { ALL_MODULES } from '../constants/modules';
 // STORE INTERFACE
 // ============================================
 
-export type MainTabId = 'main' | 'stats' | 'settings' | 'profile';
+export type MainTabId = 'main' | 'timeline' | 'stats' | 'settings' | 'profile';
 
 interface AppStore {
   // Navigation State

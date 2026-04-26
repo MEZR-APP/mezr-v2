@@ -5,7 +5,6 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { Animated } from 'react-native';
-import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useAppStore } from '../stores/appStore';
 import { useBreathStore, useCurrentPattern } from '../stores/breathStore';
 import { useActivityStore } from '../stores/activityStore';
@@ -44,18 +43,6 @@ export const useBreathingSession = () => {
   useEffect(() => {
     timerRef.current = timer;
   }, [timer]);
-
-  // Keep screen awake while breathing session is active
-  useEffect(() => {
-    if (isActive && currentModule === 'breath') {
-      activateKeepAwakeAsync('breathing-session');
-    } else {
-      deactivateKeepAwake('breathing-session');
-    }
-    return () => {
-      deactivateKeepAwake('breathing-session');
-    };
-  }, [isActive, currentModule]);
 
   // Reset animation and timerRef when session stops
   useEffect(() => {
@@ -271,93 +258,6 @@ export const useBreathingSession = () => {
     completeSession,
   ]);
   
-  // Skip to next phase (respects state machine)
-  const skipToNextPhase = useCallback(() => {
-    if (phase === 'ready' || phase === 'complete') return;
-
-    // inhale → exhale
-    if (phase === 'inhale') {
-      setPhase('exhale');
-      return;
-    }
-
-    // exhale in cycles → next breath or hold
-    if (subPhase === 'cycles' && phase === 'exhale') {
-      const nextBreath = breathCount + 1;
-      if (nextBreath < pattern.breathCycles) {
-        setBreathCount(nextBreath);
-        setPhase('inhale');
-      } else {
-        setBreathCount(0);
-        if (pattern.hold1Duration > 0) {
-          setSubPhase('hold1');
-          setPhase('hold');
-          timerRef.current = pattern.hold1Duration;
-          setTimer(pattern.hold1Duration);
-        } else if (pattern.hold2Duration > 0) {
-          setSubPhase('singleInhale');
-          setPhase('inhale');
-        } else {
-          completeSession();
-        }
-      }
-      return;
-    }
-
-    // hold1 → singleInhale or complete
-    if (subPhase === 'hold1' && phase === 'hold') {
-      setTimer(0);
-      if (pattern.hold2Duration > 0) {
-        setSubPhase('singleInhale');
-        setPhase('inhale');
-      } else {
-        completeSession();
-      }
-      return;
-    }
-
-    // singleInhale + inhale → hold2
-    if (subPhase === 'singleInhale' && phase === 'inhale') {
-      setSubPhase('hold2');
-      setPhase('hold');
-      timerRef.current = pattern.hold2Duration;
-      setTimer(pattern.hold2Duration);
-      return;
-    }
-
-    // hold2 → singleExhale
-    if (subPhase === 'hold2' && phase === 'hold') {
-      setTimer(0);
-      setSubPhase('singleExhale');
-      setPhase('exhale');
-      return;
-    }
-
-    // singleExhale + exhale → complete
-    if (subPhase === 'singleExhale' && phase === 'exhale') {
-      completeSession();
-      return;
-    }
-
-    // rest → inhale (start next session)
-    if (subPhase === 'rest' && phase === 'rest') {
-      setTimer(0);
-      setSubPhase('cycles');
-      setPhase('inhale');
-      setBreathCount(0);
-    }
-  }, [
-    phase,
-    subPhase,
-    breathCount,
-    pattern,
-    setPhase,
-    setSubPhase,
-    setBreathCount,
-    setTimer,
-    completeSession,
-  ]);
-
   // Reset function
   const reset = useCallback(() => {
     resetSession();
@@ -392,7 +292,6 @@ export const useBreathingSession = () => {
     timer,
     pattern,
     reset,
-    skipToNextPhase,
     getPhaseDisplay,
     getProgressDisplay,
   };
