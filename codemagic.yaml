@@ -35,11 +35,9 @@ workflows:
         script: npm install
       - name: EAS build Android production
         script: npx --yes eas-cli@18 build --platform android --profile production --non-interactive
+      - name: Submit to Google Play
+        script: |
+          npx --yes eas-cli@latest submit --platform android --profile production --non-interactive
     artifacts:
       - "*.aab"
       - "**/*.aab"
-    publishing:
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: internal
-        submit_as_draft: true
