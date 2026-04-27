@@ -25,6 +25,7 @@ workflows:
     environment:
       groups:
         - expo
+        - play console
       node: 18
     cache:
       cache_paths:
