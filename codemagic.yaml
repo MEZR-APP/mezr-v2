@@ -62,6 +62,7 @@ workflows:
                 echo "✅ AAB downloaded: $(ls -lh /tmp/app.aab | awk '{print $5}')"
 
                 echo "🚀 Submitting to Google Play..."
+                export GCLOUD_SERVICE_ACCOUNT_CREDENTIALS="$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS"
                 node submit-to-playstore.js /tmp/app.aab
 
                 SUBMIT_STATUS=$?

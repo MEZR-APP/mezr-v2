@@ -25,14 +25,27 @@ async function submitToPlayStore(aabPath) {
     }
 
     // Get service account credentials
-    const credentials = JSON.parse(
-      process.env.GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-    );
+    const credentialsJson = process.env.GCLOUD_SERVICE_ACCOUNT_CREDENTIALS;
 
-    if (!credentials) {
+    if (!credentialsJson) {
       throw new Error(
         'GCLOUD_SERVICE_ACCOUNT_CREDENTIALS environment variable not set'
       );
+    }
+
+    let credentials;
+    try {
+      credentials = JSON.parse(credentialsJson);
+    } catch (parseError) {
+      console.error(
+        'Failed to parse GCLOUD_SERVICE_ACCOUNT_CREDENTIALS as JSON'
+      );
+      console.error('Value:', credentialsJson.substring(0, 100) + '...');
+      throw parseError;
+    }
+
+    if (!credentials.type || credentials.type !== 'service_account') {
+      throw new Error('Invalid service account credentials format');
     }
 
     console.log('🔐 Authenticating with Google Play...');
