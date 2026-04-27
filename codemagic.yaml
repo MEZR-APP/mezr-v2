@@ -34,7 +34,44 @@ workflows:
       - name: Install npm dependencies
         script: npm install
       - name: EAS build Android production
-        script: npx --yes eas-cli@18 build --platform android --profile production --non-interactive
+        script: |
+          npx --yes eas-cli@18 build --platform android --profile production --non-interactive > /tmp/eas-output.txt 2>&1
+          cat /tmp/eas-output.txt
+
+          # Extract artifact URL
+          AAB_URL=$(grep -oE 'https://expo.dev/artifacts/eas/[a-zA-Z0-9_-]+\.aab' /tmp/eas-output.txt | head -1)
+          if [ -n "$AAB_URL" ]; then
+            echo "AAB_URL=$AAB_URL" > /tmp/aab-url.txt
+          fi
+
+      - name: Submit to Google Play
+        script: |
+          # Get AAB URL from previous step
+          if [ -f /tmp/aab-url.txt ]; then
+            source /tmp/aab-url.txt
+
+            if [ -n "$AAB_URL" ]; then
+              echo "📥 Downloading AAB from EAS..."
+              curl -L -o /tmp/app.aab "$AAB_URL"
+
+              if [ -f /tmp/app.aab ] && [ -s /tmp/app.aab ]; then
+                echo "✅ AAB downloaded: $(ls -lh /tmp/app.aab | awk '{print $5}')"
+
+                echo "🚀 Submitting to Google Play..."
+                node submit-to-playstore.js /tmp/app.aab
+
+                # Cleanup
+                rm -f /tmp/app.aab /tmp/aab-url.txt /tmp/eas-output.txt
+              else
+                echo "❌ Failed to download AAB"
+                exit 1
+              fi
+            fi
+          else
+            echo "⚠️  Could not extract AAB URL, skipping submission"
+            exit 0
+          fi
+
     artifacts:
       - "*.aab"
       - "**/*.aab"
