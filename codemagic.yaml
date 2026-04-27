@@ -46,6 +46,10 @@ workflows:
 
       - name: Submit to Google Play
         script: |
+          # Install googleapis dependency
+          echo "📦 Installing Google Play API library..."
+          npm install googleapis --save
+
           # Get AAB URL from previous step
           if [ -f /tmp/aab-url.txt ]; then
             source /tmp/aab-url.txt
@@ -60,8 +64,18 @@ workflows:
                 echo "🚀 Submitting to Google Play..."
                 node submit-to-playstore.js /tmp/app.aab
 
+                SUBMIT_STATUS=$?
+
                 # Cleanup
                 rm -f /tmp/app.aab /tmp/aab-url.txt /tmp/eas-output.txt
+
+                if [ $SUBMIT_STATUS -eq 0 ]; then
+                  echo "✨ Submission complete!"
+                  exit 0
+                else
+                  echo "❌ Submission failed"
+                  exit 1
+                fi
               else
                 echo "❌ Failed to download AAB"
                 exit 1
