@@ -39,19 +39,3 @@ yarn-error.*
 # generated native folders
 /ios
 /android
-
-# Junk files
-claude downloads/
-privacy documents/
-abb files/
-app icons/
-screenshots/
-public/
-assets/
-.tmp.driveupload/
-
-# Credentials
-credentials.json
-mezr-key.jks
-# Cursor
-.claude/
