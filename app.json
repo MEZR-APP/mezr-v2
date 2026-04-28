@@ -22,7 +22,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./src/assets/app-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -30,7 +30,7 @@
       "package": "com.ashok.mezr"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/assets/app-icon.png"
     },
     "extra": {
       "eas": {
