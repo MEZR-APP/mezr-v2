@@ -14,7 +14,6 @@ import {
 import { db } from '../services/firebase';
 import { useAppStore } from './appStore';
 import { useAuthStore } from './authStore';
-import useTimelineStore from './timelineStore';
 
 // ============================================
 // STORE INTERFACE
