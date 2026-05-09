@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mezr Design System - v1.0.2+ (Accurate from Code)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            font-weight: 200;
+            letter-spacing: 4px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 60px;
+            letter-spacing: 2px;
+        }
+
+        .section {
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #222;
+            letter-spacing: 2px;
+        }
+
+        /* COLOR PALETTE */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .color-swatch {
+            border: 1px solid #222;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .color-box {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-info {
+            padding: 15px;
+            background: #0a0a0a;
+        }
+
+        .color-name {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .color-hex {
+            font-size: 10px;
+            color: #666;
+            letter-spacing: 0.5px;
+        }
+
+        /* TYPOGRAPHY */
+        .typography-grid {
+            display: grid;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .typography-item {
+            border-left: 1px solid #222;
+            padding-left: 20px;
+        }
+
+        .typography-sample {
+            margin-bottom: 10px;
+        }
+
+        .typography-info {
+            font-size: 11px;
+            color: #666;
+            letter-spacing: 1px;
+        }
+
+        /* MODULES LAYOUT */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .module-card {
+            border: 1px solid #222;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #0a0a0a;
+        }
+
+        .module-header {
+            padding: 20px;
+            background: #111;
+            border-bottom: 1px solid #222;
+        }
+
+        .module-name {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .module-display {
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            background: #000;
+            position: relative;
+        }
+
+        /* Breath Circle */
+        .breathing-circle {
+            width: 180px;
+            height: 180px;
+            border: 1.5px solid #fff;
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .breathing-circle.ambient {
+            opacity: 0.3;
+            border-width: 1px;
+        }
+
+        .breath-label {
+            margin-top: 50px;
+            font-size: 22px;
+            font-weight: 200;
+            letter-spacing: 8px;
+            min-height: 30px;
+            text-align: center;
+        }
+
+        .breath-counter {
+            margin-top: 15px;
+            font-size: 10px;
+            color: #888;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        /* Candle Simulation */
+        .candle-container {
+            position: relative;
+            width: 120px;
+            height: 200px;
+            margin-bottom: 30px;
+        }
+
+        .flame {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 80px;
+            background: linear-gradient(to top, #ff6b00, #ffaa00, #ffff00);
+            border-radius: 50% 50% 50% 0;
+            filter: blur(3px);
+            animation: flicker 2s ease-in-out infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { height: 80px; opacity: 1; }
+            50% { height: 90px; opacity: 0.8; }
+        }
+
+        .candle-base {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 60px;
+            background: #f5deb3;
+            border-radius: 2px;
+        }
+
+        /* Large Numbers */
+        .large-number {
+            font-size: 90px;
+            font-weight: 100;
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+
+        .small-label {
+            font-size: 14px;
+            color: #888;
+            letter-spacing: 4px;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .button-group {
+            border: 1px solid #222;
+            padding: 20px;
+            border-radius: 8px;
+            background: #0a0a0a;
+        }
+
+        .button-group-title {
+            font-size: 12px;
+            color: #666;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .button {
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .button:last-child {
+            margin-bottom: 0;
+        }
+
+        .button-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .button-primary:hover {
+            opacity: 0.9;
+        }
+
+        .button-secondary {
+            background: #1a1a1a;
+            color: #888;
+        }
+
+        .button-secondary:hover {
+            background: #222;
+        }
+
+        .button-danger {
+            background: #1a0000;
+            color: #ff4444;
+        }
+
+        .button-danger:hover {
+            background: #2a0000;
+        }
+
+        .large-button {
+            padding: 20px;
+            border-radius: 40px;
+            font-size: 13px;
+            min-width: 220px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        /* Bottom Tab Bar */
+        .tab-bar {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 64px;
+            background: #000;
+            border-top: 1px solid #111;
+            padding-bottom: 28px;
+            margin-top: 30px;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            gap: 5px;
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            border: 1px solid #666;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .tab-item.active .tab-icon {
+            border-color: #fff;
+            color: #fff;
+        }
+
+        .tab-label {
+            font-size: 8px;
+            color: #666;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-item.active .tab-label {
+            color: #fff;
+        }
+
+        /* Category Bar */
+        .category-bar {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 15px 0;
+            border-bottom: 1px solid #111;
+            margin-bottom: 30px;
+        }
+
+        .category-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: #0a0a0a;
+            border-radius: 20px;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            color: #888;
+            white-space: nowrap;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .category-tab.active {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+        }
+
+        /* Device Mockup */
+        .mockup-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .device-frame {
+            border: 12px solid #1a1a1a;
+            border-radius: 40px;
+            overflow: hidden;
+            aspect-ratio: 9 / 19.5;
+            background: #000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .device-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #000;
+            position: relative;
+        }
+
+        .screen-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #222;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 200;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .screen-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .screen-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            border-top: 1px solid #111;
+        }
+
+        /* Specs Section */
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .specs-table th,
+        .specs-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            font-size: 12px;
+        }
+
+        .specs-table th {
+            background: #111;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        .specs-table td {
+            color: #888;
+        }
+
+        .code-block {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #888;
+            overflow-x: auto;
+            line-height: 1.6;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MEZR</h1>
+        <div class="subtitle">Design System v1.0.2+ (Accurate from Code Specifications)</div>
+
+        <!-- COLOR PALETTE -->
+        <div class="section">
+            <h2 class="section-title">01 / COLOR PALETTE</h2>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #000;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Background</div>
+                        <div class="color-hex">#000000</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #0a0a0a;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Background Dark</div>
+                        <div class="color-hex">#0A0A0A</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #111;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Card</div>
+                        <div class="color-hex">#111111</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #1a1a1a;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Elevated</div>
+                        <div class="color-hex">#1A1A1A</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #fff; border: 1px solid #ddd;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Text Primary</div>
+                        <div class="color-hex">#FFFFFF</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #888;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Text Secondary</div>
+                        <div class="color-hex">#888888</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #666;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Text Muted</div>
+                        <div class="color-hex">#666666</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #444;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Text Dark</div>
+                        <div class="color-hex">#444444</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #ff4444;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Danger / Alert</div>
+                        <div class="color-hex">#FF4444</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #1a0000;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Danger Background</div>
+                        <div class="color-hex">#1A0000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TYPOGRAPHY -->
+        <div class="section">
+            <h2 class="section-title">02 / TYPOGRAPHY</h2>
+            <div class="typography-grid">
+                <div class="typography-item">
+                    <div class="typography-sample" style="font-size: 18px; font-weight: 200; letter-spacing: 4px;">
+                        BREATH
+                    </div>
+                    <div class="typography-info">Active Module • 18px, 200 weight, 4px tracking</div>
+                </div>
+                <div class="typography-item">
+                    <div class="typography-sample" style="font-size: 22px; font-weight: 200; letter-spacing: 8px;">
+                        INHALE
+                    </div>
+                    <div class="typography-info">Phase Text • 22px, 200 weight, 8px tracking</div>
+                </div>
+                <div class="typography-item">
+                    <div class="typography-sample" style="font-size: 90px; font-weight: 100;">
+                        42
+                    </div>
+                    <div class="typography-info">Large Numbers • 90px, 100 weight</div>
+                </div>
+                <div class="typography-item">
+                    <div class="typography-sample" style="font-size: 14px; letter-spacing: 4px;">
+                        LAPS
+                    </div>
+                    <div class="typography-info">Labels • 14px, 600 weight, 4px tracking</div>
+                </div>
+                <div class="typography-item">
+                    <div class="typography-sample" style="font-size: 10px; letter-spacing: 2px; font-weight: 600;">
+                        HEALTH CATEGORY
+                    </div>
+                    <div class="typography-info">Category Label • 10px, 600 weight, 2px tracking</div>
+                </div>
+                <div class="typography-item">
+                    <div class="typography-sample" style="font-size: 11px; letter-spacing: 1px; color: #666;">
+                        Ambient circle with breathing animation
+                    </div>
+                    <div class="typography-info">Description • 11px, regular weight, 1px tracking</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULES -->
+        <div class="section">
+            <h2 class="section-title">03 / MODULES</h2>
+            <div class="modules-grid">
+                <!-- Breath Module -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-name">BREATH</div>
+                    </div>
+                    <div class="module-display">
+                        <div class="breathing-circle"></div>
+                        <div class="breath-label">INHALE</div>
+                        <div class="breath-counter">5 / 10 CYCLES</div>
+                    </div>
+                </div>
+
+                <!-- Swim Module -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-name">SWIM</div>
+                    </div>
+                    <div class="module-display">
+                        <div class="large-number">24</div>
+                        <div class="small-label">LAPS</div>
+                        <div class="small-label" style="color: #666; margin-top: 20px;">05:32</div>
+                    </div>
+                </div>
+
+                <!-- Meditate/Zen Module -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-name">ZEN (MEDITATE)</div>
+                    </div>
+                    <div class="module-display">
+                        <div class="breathing-circle ambient"></div>
+                        <div class="large-number" style="margin-top: 30px;">03:45</div>
+                    </div>
+                </div>
+
+                <!-- Gaze Module -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-name">GAZE</div>
+                    </div>
+                    <div class="module-display">
+                        <div class="candle-container">
+                            <div class="flame"></div>
+                            <div class="candle-base"></div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="breath-label">EXHALE</div>
+                            <div class="breath-counter" style="margin-top: 20px;">02:35</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="section">
+            <h2 class="section-title">04 / BUTTONS</h2>
+            <div class="buttons-grid">
+                <div class="button-group">
+                    <div class="button-group-title">PRIMARY</div>
+                    <button class="button button-primary large-button">START</button>
+                    <button class="button button-primary" style="margin-top: 10px;">PAUSE</button>
+                </div>
+                <div class="button-group">
+                    <div class="button-group-title">SECONDARY</div>
+                    <button class="button button-secondary">SKIP</button>
+                    <button class="button button-secondary">RESUME</button>
+                </div>
+                <div class="button-group">
+                    <div class="button-group-title">DANGER</div>
+                    <button class="button button-danger">RESET</button>
+                    <button class="button button-danger">END</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVIGATION -->
+        <div class="section">
+            <h2 class="section-title">05 / NAVIGATION</h2>
+
+            <h3 style="font-size: 14px; margin: 30px 0 20px 0; letter-spacing: 2px;">Category Bar</h3>
+            <div class="category-bar">
+                <div class="category-tab active">🏃 HEALTH</div>
+                <div class="category-tab">😴 WELLNESS</div>
+                <div class="category-tab">📝 PRODUCTIVITY</div>
+                <div class="category-tab">💰 FINANCE</div>
+            </div>
+
+            <h3 style="font-size: 14px; margin: 30px 0 20px 0; letter-spacing: 2px;">Bottom Tab Bar (64px height)</h3>
+            <div class="tab-bar">
+                <div class="tab-item active">
+                    <div class="tab-icon">🏠</div>
+                    <div class="tab-label">HOME</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">📊</div>
+                    <div class="tab-label">STATS</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">⚙️</div>
+                    <div class="tab-label">SETTINGS</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">👤</div>
+                    <div class="tab-label">PROFILE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEVICE MOCKUPS -->
+        <div class="section">
+            <h2 class="section-title">06 / SCREEN LAYOUTS</h2>
+            <div class="mockup-container">
+                <div style="position: relative;">
+                    <h3 style="margin-bottom: 20px; letter-spacing: 2px;">iPhone 12 Pro - Breath Module</h3>
+                    <div class="device-frame">
+                        <div class="device-content">
+                            <div class="screen-header">
+                                <div class="header-title">BREATH</div>
+                                <div style="font-size: 10px; color: #666; letter-spacing: 1px;">🏃 HEALTH</div>
+                            </div>
+                            <div class="screen-main">
+                                <div class="breathing-circle"></div>
+                                <div class="breath-label">EXHALE</div>
+                                <div class="breath-counter">3 / 5 CYCLES</div>
+                            </div>
+                            <div class="screen-footer">
+                                <div class="tab-bar" style="margin: 0;">
+                                    <div class="tab-item active">
+                                        <div class="tab-icon">🏠</div>
+                                    </div>
+                                    <div class="tab-item">
+                                        <div class="tab-icon">📊</div>
+                                    </div>
+                                    <div class="tab-item">
+                                        <div class="tab-icon">⚙️</div>
+                                    </div>
+                                    <div class="tab-item">
+                                        <div class="tab-icon">👤</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="position: relative;">
+                    <h3 style="margin-bottom: 20px; letter-spacing: 2px;">iPhone 12 Pro - Gaze Module</h3>
+                    <div class="device-frame">
+                        <div class="device-content">
+                            <div class="screen-header">
+                                <div class="header-title">GAZE</div>
+                                <div style="font-size: 10px; color: #666; letter-spacing: 1px;">😴 WELLNESS</div>
+                            </div>
+                            <div class="screen-main">
+                                <div class="candle-container">
+                                    <div class="flame"></div>
+                                    <div class="candle-base"></div>
+                                </div>
+                                <div class="breath-label">INHALE</div>
+                                <div class="breath-counter" style="margin-top: 20px;">04:23 REMAINING</div>
+                            </div>
+                            <div class="screen-footer">
+                                <div class="tab-bar" style="margin: 0;">
+                                    <div class="tab-item active">
+                                        <div class="tab-icon">🏠</div>
+                                    </div>
+                                    <div class="tab-item">
+                                        <div class="tab-icon">📊</div>
+                                    </div>
+                                    <div class="tab-item">
+                                        <div class="tab-icon">⚙️</div>
+                                    </div>
+                                    <div class="tab-item">
+                                        <div class="tab-icon">👤</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPECIFICATIONS -->
+        <div class="section">
+            <h2 class="section-title">07 / SPECIFICATIONS</h2>
+
+            <h3 style="font-size: 14px; margin: 30px 0 20px 0; letter-spacing: 2px;">Button Specifications</h3>
+            <table class="specs-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>State</th>
+                        <th>Dimensions</th>
+                        <th>Styling</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Primary</td>
+                        <td>Default</td>
+                        <td>220px min width, 20px py, 60px px</td>
+                        <td>#FFF bg, #000 text, 40px radius</td>
+                    </tr>
+                    <tr>
+                        <td>Secondary</td>
+                        <td>Default</td>
+                        <td>80px min width, 12px py, 20px px</td>
+                        <td>#1A1A1A bg, #666 text, 25px radius</td>
+                    </tr>
+                    <tr>
+                        <td>Danger</td>
+                        <td>Default</td>
+                        <td>80px min width, 12px py, 20px px</td>
+                        <td>#1A0000 bg, #FF4444 text, 25px radius</td>
+                    </tr>
+                    <tr>
+                        <td>All</td>
+                        <td>All</td>
+                        <td>-</td>
+                        <td>Font weight 700, letter-spacing 2px, 11px</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="font-size: 14px; margin: 30px 0 20px 0; letter-spacing: 2px;">Module Dimensions</h3>
+            <table class="specs-table">
+                <thead>
+                    <tr>
+                        <th>Module</th>
+                        <th>Circle Size</th>
+                        <th>Font Size (Large)</th>
+                        <th>Key Feature</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>BREATH</td>
+                        <td>180 × 180px</td>
+                        <td>22px (phase)</td>
+                        <td>Animated pulse, 1.5px border</td>
+                    </tr>
+                    <tr>
+                        <td>SWIM</td>
+                        <td>-</td>
+                        <td>90px (counter)</td>
+                        <td>Large tap zone, lap counter</td>
+                    </tr>
+                    <tr>
+                        <td>ZEN</td>
+                        <td>180 × 180px</td>
+                        <td>90px (timer)</td>
+                        <td>Ambient 0.3 opacity, breathing pulse</td>
+                    </tr>
+                    <tr>
+                        <td>GAZE</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Candle animation, breathing guide text</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="font-size: 14px; margin: 30px 0 20px 0; letter-spacing: 2px;">Spacing & Layout</h3>
+            <table class="specs-table">
+                <thead>
+                    <tr>
+                        <th>Element</th>
+                        <th>Dimension</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bottom Tab Bar</td>
+                        <td>64px height, 28px padding-bottom</td>
+                        <td>4 tabs (Home, Stats, Settings, Profile)</td>
+                    </tr>
+                    <tr>
+                        <td>Category Bar</td>
+                        <td>Scrollable horizontal</td>
+                        <td>4 categories with emoji, 20px padding</td>
+                    </tr>
+                    <tr>
+                        <td>Top Header</td>
+                        <td>20px margin-top, 30px horizontal padding</td>
+                        <td>Module name + Sound toggle + Settings icon</td>
+                    </tr>
+                    <tr>
+                        <td>Main Display</td>
+                        <td>Flex 1, centered</td>
+                        <td>Contains module-specific content</td>
+                    </tr>
+                    <tr>
+                        <td>Button Container</td>
+                        <td>80px from bottom, centered</td>
+                        <td>START/STOP or module control buttons</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- MODULES REFERENCE -->
+        <div class="section">
+            <h2 class="section-title">08 / MODULES REFERENCE (v1.0.2+)</h2>
+
+            <h3 style="font-size: 14px; margin: 20px 0 15px 0; letter-spacing: 2px;">HEALTH Category</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li style="padding: 10px 0; color: #888; font-size: 12px; letter-spacing: 1px;">
+                    ✓ BREATH - Animated breathing circle (180px), phase text, cycle counter
+                </li>
+                <li style="padding: 10px 0; color: #888; font-size: 12px; letter-spacing: 1px;">
+                    ✓ SWIM - Tap-to-count laps, large counter display, elapsed time
+                </li>
+                <li style="padding: 10px 0; color: #888; font-size: 12px; letter-spacing: 1px;">
+                    ⏳ RUN - Coming Soon
+                </li>
+                <li style="padding: 10px 0; color: #888; font-size: 12px; letter-spacing: 1px;">
+                    ⏳ CYCLE - Coming Soon
+                </li>
+            </ul>
+
+            <h3 style="font-size: 14px; margin: 20px 0 15px 0; letter-spacing: 2px;">WELLNESS Category</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li style="padding: 10px 0; color: #888; font-size: 12px; letter-spacing: 1px;">
+                    ✓ ZEN (Meditate) - Ambient circle with breathing animation, timer
+                </li>
+                <li style="padding: 10px 0; color: #888; font-size: 12px; letter-spacing: 1px;">
+                    ✓ GAZE - Candle animation, breathing guide (Inhale/Exhale), 4-second cycle
+                </li>
+            </ul>
+
+            <h3 style="font-size: 14px; margin: 20px 0 15px 0; letter-spacing: 2px;">Screen Tabs</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li style="padding: 10px 0; color: #888; font-size: 12px; letter-spacing: 1px;">
+                    HOME (🏠) - Main module display with category bar
+                </li>
+                <li style="padding: 10px 0; color: #888; font-size: 12px; letter-spacing: 1px;">
+                    STATS (📊) - Weekly activity, habit stacks, session counts
+                </li>
+                <li style="padding: 10px 0; color: #888; font-size: 12px; letter-spacing: 1px;">
+                    SETTINGS (⚙️) - Module configuration, duration, cloud backup
+                </li>
+                <li style="padding: 10px 0; color: #888; font-size: 12px; letter-spacing: 1px;">
+                    PROFILE (👤) - User info, privacy, export/import data
+                </li>
+            </ul>
+        </div>
+
+        <!-- KEY INSIGHTS -->
+        <div class="section">
+            <h2 class="section-title">09 / KEY INSIGHTS</h2>
+            <div class="code-block">
+// EXACT FROM SOURCE CODE SPECIFICATIONS:
+//
+// 1. Breathing circles are animated (mainAnim scale, pulseAnim)
+//    - Breath Module: Active scale animation
+//    - Meditate Module: Subtle breathing pulse (1 → 1.05 → 1)
+//
+// 2. Module has specific button flows:
+//    - Breath: PAUSE, SKIP, RESET (when active)
+//    - Swim: Tap-to-count (no button flow)
+//    - Meditate: Timer with auto-complete
+//    - Gaze: START → PAUSE/RESUME → END
+//
+// 3. Bottom tab bar is 64px with 28px additional bottom padding
+//    This prevents content from being hidden behind it
+//
+// 4. All typography uses letter-spacing extensively:
+//    - Headings: 4px-8px tracking
+//    - Labels: 2px-4px tracking
+//    - Small text: 1px-2px tracking
+//
+// 5. Colors are strictly minimal:
+//    - Dark theme (#000, #0a0a0a, #111, #1a1a1a)
+//    - White text (#fff)
+//    - Grey accents (#333-#888)
+//    - Single alert color (#ff4444)
+//
+// 6. All borders use 1px-1.5px width in #222 or #333
+//
+// 7. Border radius follows pattern:
+//    - Circles: 50%
+//    - Buttons: 25px (small) → 40px (large)
+//    - Cards: 8px
+            </div>
+        </div>
+
+        <div style="margin-top: 80px; padding-top: 40px; border-top: 1px solid #222; text-align: center; color: #666; font-size: 11px; letter-spacing: 1px;">
+            MEZR DESIGN SYSTEM v1.0.2+ • ACCURATE FROM SOURCE CODE • LAST UPDATED MAY 8, 2026
+        </div>
+    </div>
+</body>
+</html>
