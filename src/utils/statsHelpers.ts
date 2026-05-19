@@ -12,6 +12,7 @@ const MODULE_LABELS: Record<ModuleId, string> = {
   meditate: 'Zen',
   run: 'Run',
   cycle: 'Cycle',
+  gaze: 'Gaze',
 };
 
 export const MODULE_COLORS: Record<ModuleId, string> = {
@@ -20,6 +21,7 @@ export const MODULE_COLORS: Record<ModuleId, string> = {
   swim: '#3B82F6',
   run: '#EF4444',
   cycle: '#F59E0B',
+  gaze: '#A78BFA',
 };
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -136,6 +138,7 @@ export function getHabitStacks(history: ActivityEntry[]): HabitStackBlock[] {
     meditate: 0,
     run: 0,
     cycle: 0,
+    gaze: 0,
   };
   weekSessions.forEach((modules) => {
     modules.forEach((m) => {
@@ -153,7 +156,7 @@ export function getHabitStacks(history: ActivityEntry[]): HabitStackBlock[] {
     }
   }
   const blocks: HabitStackBlock[] = [];
-  const order: ModuleId[] = ['breath', 'swim', 'meditate', 'run', 'cycle'];
+  const order: ModuleId[] = ['breath', 'swim', 'meditate', 'run', 'cycle', 'gaze'];
   const withSessions = order.filter((m) => (byModule.get(m) ?? 0) > 0);
   // Breathing always at bottom (base); then by session count descending
   const breathCount = byModule.get('breath') ?? 0;
@@ -258,7 +261,7 @@ export function getModuleDetail(history: ActivityEntry[], module: ModuleId): Mod
 export function getModulesWithData(history: ActivityEntry[]): ModuleId[] {
   const set = new Set<ModuleId>();
   history.forEach((e) => set.add(e.type));
-  const order: ModuleId[] = ['breath', 'swim', 'meditate', 'run', 'cycle'];
+  const order: ModuleId[] = ['breath', 'swim', 'meditate', 'run', 'cycle', 'gaze'];
   return order.filter((m) => set.has(m));
 }
 

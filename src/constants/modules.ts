@@ -30,6 +30,7 @@ export const ALL_MODULES: Module[] = [
   { id: 'run', label: 'RUN', category: 'health' },
   { id: 'cycle', label: 'CYCLE', category: 'health' },
   { id: 'meditate', label: 'ZEN', category: 'wellness' },
+  { id: 'gaze', label: 'GAZE', category: 'wellness' },
 ];
 
 // ============================================
@@ -119,6 +120,12 @@ export const MODULE_SOUNDS: ModuleSounds = {
   cycle: {
     pedal: {
       url: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+      pitch: 1.0,
+    },
+  },
+  gaze: {
+    breathing: {
+      url: 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3',
       pitch: 1.0,
     },
   },

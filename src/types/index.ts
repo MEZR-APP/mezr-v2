@@ -18,7 +18,7 @@ export interface Module {
   category: string;
 }
 
-export type ModuleId = 'breath' | 'swim' | 'run' | 'cycle' | 'meditate';
+export type ModuleId = 'breath' | 'swim' | 'run' | 'cycle' | 'meditate' | 'gaze';
 
 export type CategoryId = 'health' | 'wellness' | 'productivity' | 'finance';
 
@@ -94,12 +94,18 @@ export interface CycleSounds {
   pedal: SoundConfig;
 }
 
+export interface GazeSounds {
+  inhale: SoundConfig;
+  exhale: SoundConfig;
+}
+
 export interface ModuleSounds {
   breath: BreathSounds;
   swim: SwimSounds;
   meditate: MeditateSounds;
   run: RunSounds;
   cycle: CycleSounds;
+  gaze: GazeSounds;
 }
 
 // ============================================
@@ -140,12 +146,19 @@ export interface CycleActivityEntry extends BaseActivityEntry {
   duration?: number;
 }
 
+export interface GazeActivityEntry extends BaseActivityEntry {
+  type: 'gaze';
+  duration?: number;
+  targetDuration?: number;
+}
+
 export type ActivityEntry =
   | BreathActivityEntry
   | SwimActivityEntry
   | MeditateActivityEntry
   | RunActivityEntry
-  | CycleActivityEntry;
+  | CycleActivityEntry
+  | GazeActivityEntry;
 
 // ============================================
 // STATS / HABIT STACK TYPES

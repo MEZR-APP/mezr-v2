@@ -31,6 +31,7 @@ const TAB_INACTIVE_COLOR = '#666666';
 import { BreathModule } from '../components/modules/BreathModule';
 import { SwimModule } from '../components/modules/SwimModule';
 import { MeditateModule } from '../components/modules/MeditateModule';
+import GazeModule from '../components/modules/GazeModule';
 export default function MainScreen() {
   // App Store
   const currentModule = useAppStore((state) => state.currentModule);
@@ -66,6 +67,8 @@ export default function MainScreen() {
   const [targetDuration, setTargetDuration] = useState('30');
   const [cycleDistance, setCycleDistance] = useState('10');
   const [cycleDuration, setCycleDuration] = useState('45');
+  const [gazeDuration, setGazeDuration] = useState('5'); // Gaze duration in minutes (default 5)
+  const [gazeObject, setGazeObject] = useState('candle'); // Gaze object: candle or cosmos
 
   const setCloudBackupEnabled = useAppStore((state) => state.setCloudBackupEnabled);
 
@@ -122,6 +125,10 @@ export default function MainScreen() {
     setCycleDistance,
     cycleDuration,
     setCycleDuration,
+    gazeDuration,
+    setGazeDuration,
+    gazeObject,
+    setGazeObject,
   };
 
   return (
@@ -171,22 +178,27 @@ export default function MainScreen() {
             {currentModule === 'meditate' && (
               <MeditateModule medTime={medTime} setMedTime={setMedTime} />
             )}
+            {currentModule === 'gaze' && (
+              <GazeModule gazeMinutes={parseInt(gazeDuration) || 5} onClose={() => setIsActive(false)} />
+            )}
             {(currentModule === 'run' || currentModule === 'cycle') && (
               <View style={styles.comingSoonContainer}>
                 <Text style={styles.comingSoonText}>Coming Soon</Text>
               </View>
             )}
           </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.button, isActive && styles.buttonActive]}
-              onPress={handleStartStop}
-            >
-              <Text style={[styles.buttonText, isActive && styles.buttonTextActive]}>
-                {isActive ? 'STOP' : 'START'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {currentModule !== 'gaze' && (
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, isActive && styles.buttonActive]}
+                onPress={handleStartStop}
+              >
+                <Text style={[styles.buttonText, isActive && styles.buttonTextActive]}>
+                  {isActive ? 'STOP' : 'START'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </>
       )}
       {currentTab === 'stats' && <StatsScreen />}

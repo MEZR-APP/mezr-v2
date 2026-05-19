@@ -18,12 +18,15 @@ import {
 import { colors } from '../theme/colors';
 import { useAppStore } from '../stores/appStore';
 import { useBreathStore } from '../stores/breathStore';
+import { useGazeStore } from '../stores/gazeStore';
 import { useActivityStore, useActivityStats } from '../stores/activityStore';
 import { useAuthStore } from '../stores/authStore';
 import { PatternBuilder } from './PatternBuilder';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { DEFAULT_MED_TIME } from '../constants/modules';
 import { loadCloudBackupEnabled, saveCloudBackupEnabled } from '../services/storageService';
+import { GAZE_VISUALS_REGISTRY } from '../constants/gazeVisualsConfig';
+import { GAZE_AUDIO_REGISTRY } from '../constants/gazeAudioConfig';
 
 interface SettingsScreenProps {
   // Swim settings
@@ -49,7 +52,102 @@ interface SettingsScreenProps {
   setCycleDistance: (value: string) => void;
   cycleDuration: string;
   setCycleDuration: (value: string) => void;
+  // Gaze settings
+  gazeDuration: string;
+  setGazeDuration: (value: string) => void;
+  gazeObject?: string;
+  setGazeObject?: (value: string) => void;
 }
+
+/**
+ * Gaze Visual Picker Component
+ * Allows user to select between available visual themes (candle, cosmos, etc.)
+ */
+const GazeVisualPicker: React.FC = () => {
+  const visualId = useGazeStore((state) => state.settings.visualId);
+  const setVisual = useGazeStore((state) => state.setVisual);
+
+  return (
+    <View style={styles.settingItem}>
+      <Text style={styles.settingLabel}>Visual Theme</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.pickerScroll}
+        contentContainerStyle={styles.pickerContent}
+      >
+        {Object.entries(GAZE_VISUALS_REGISTRY).map(([key, visual]) => (
+          <TouchableOpacity
+            key={key}
+            onPress={() => setVisual(key as 'candle' | 'cosmos')}
+            style={[
+              styles.pickerTile,
+              visualId === key && styles.pickerTileActive,
+            ]}
+          >
+            <View
+              style={[
+                styles.pickerThumbnail,
+                { backgroundColor: visual.thumbnailColor },
+              ]}
+            />
+            <Text
+              style={[
+                styles.pickerLabel,
+                visualId === key && styles.pickerLabelActive,
+              ]}
+            >
+              {visual.name}
+            </Text>
+            <Text style={styles.pickerDescription}>{visual.description}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
+
+/**
+ * Gaze Audio Picker Component
+ * Allows user to select between available audio effects (crackling, ambient, silence)
+ */
+const GazeAudioPicker: React.FC = () => {
+  const audioId = useGazeStore((state) => state.settings.audioId);
+  const setAudio = useGazeStore((state) => state.setAudio);
+
+  return (
+    <View style={styles.settingItem}>
+      <Text style={styles.settingLabel}>Background Sound</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.pickerScroll}
+        contentContainerStyle={styles.pickerContent}
+      >
+        {Object.entries(GAZE_AUDIO_REGISTRY).map(([key, audio]) => (
+          <TouchableOpacity
+            key={key}
+            onPress={() => setAudio(key as 'crackling' | 'ambient-space' | 'silence')}
+            style={[
+              styles.audioTile,
+              audioId === key && styles.audioTileActive,
+            ]}
+          >
+            <Text
+              style={[
+                styles.audioLabel,
+                audioId === key && styles.audioLabelActive,
+              ]}
+            >
+              {audio.name}
+            </Text>
+            <Text style={styles.audioDescription}>{audio.description}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   targetLaps,
@@ -71,6 +169,10 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   setCycleDistance,
   cycleDuration,
   setCycleDuration,
+  gazeDuration,
+  setGazeDuration,
+  gazeObject = 'candle',
+  setGazeObject,
 }) => {
   const currentModule = useAppStore((state) => state.currentModule);
   const setShowSettings = useAppStore((state) => state.setShowSettings);
@@ -354,6 +456,32 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           </View>
         )}
 
+        {/* GAZE MODULE SETTINGS */}
+        {currentModule === 'gaze' && (
+          <View style={styles.fullWidth}>
+            {/* Duration Setting */}
+            <View style={styles.settingItem}>
+              <Text style={styles.settingLabel}>Default Session Duration (minutes)</Text>
+              <TextInput
+                style={styles.input}
+                value={gazeDuration}
+                onChangeText={setGazeDuration}
+                keyboardType="numeric"
+                placeholder="5"
+                placeholderTextColor={colors.textDarker}
+              />
+            </View>
+
+            {/* Visual Selection */}
+            <GazeVisualPicker />
+
+            {/* Audio Selection */}
+            <GazeAudioPicker />
+
+            <Text style={styles.comingSoonText}>Focus, sync your breath, let your mind settle</Text>
+          </View>
+        )}
+
         {/* CLOUD BACKUP (Global - All Modules) */}
         <Text style={[styles.settingsTitle, { marginTop: 30 }]}>
           CLOUD BACKUP (ALL MODULES)
@@ -607,6 +735,112 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 10,
     letterSpacing: 0.5,
+  },
+
+  // Gaze object selection buttons
+  objectSelectionRow: {
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'center',
+    width: '100%',
+  },
+  objectButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: colors.inputBackground,
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  objectButtonActive: {
+    backgroundColor: colors.buttonPrimary,
+    borderColor: colors.buttonPrimary,
+  },
+  objectButtonText: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  objectButtonTextActive: {
+    color: colors.buttonPrimaryText,
+  },
+
+  // Gaze Visual/Audio Picker Styles
+  pickerScroll: {
+    marginTop: 10,
+    marginBottom: 15,
+  },
+  pickerContent: {
+    paddingHorizontal: 5,
+    gap: 12,
+  },
+  pickerTile: {
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: colors.inputBackground,
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    minWidth: 100,
+  },
+  pickerTileActive: {
+    backgroundColor: colors.buttonPrimary,
+    borderColor: colors.buttonPrimary,
+  },
+  pickerThumbnail: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  pickerLabel: {
+    color: colors.textPrimary,
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  pickerLabelActive: {
+    color: colors.buttonPrimaryText,
+  },
+  pickerDescription: {
+    color: colors.textMuted,
+    fontSize: 10,
+    fontWeight: '400',
+    textAlign: 'center',
+  },
+
+  // Audio Picker Styles
+  audioTile: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: colors.inputBackground,
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    minWidth: 110,
+    alignItems: 'center',
+  },
+  audioTileActive: {
+    backgroundColor: colors.buttonPrimary,
+    borderColor: colors.buttonPrimary,
+  },
+  audioLabel: {
+    color: colors.textPrimary,
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  audioLabelActive: {
+    color: colors.buttonPrimaryText,
+  },
+  audioDescription: {
+    color: colors.textMuted,
+    fontSize: 10,
+    fontWeight: '400',
+    textAlign: 'center',
   },
 });
 

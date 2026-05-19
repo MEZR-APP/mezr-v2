@@ -37,6 +37,7 @@ interface ActivityStore {
     meditate: number;
     run: number;
     cycle: number;
+    gaze: number;
   };
 }
 
@@ -110,13 +111,14 @@ export const useActivityStore = create<ActivityStore>((set, get) => ({
   // Stats
   getStats: () => {
     const { history } = get();
-    
+
     return {
       breath: history.filter((i) => i.type === 'breath').length,
       swim: history.filter((i) => i.type === 'swim').length,
       meditate: history.filter((i) => i.type === 'meditate').length,
       run: history.filter((i) => i.type === 'run').length,
       cycle: history.filter((i) => i.type === 'cycle').length,
+      gaze: history.filter((i) => i.type === 'gaze').length,
     };
   },
 }));

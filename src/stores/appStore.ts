@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import type { CategoryId, ModuleId, ToastState } from '../types';
 import { ALL_MODULES } from '../constants/modules';
+import { useActivityStore } from './activityStore';
 
 // ============================================
 // STORE INTERFACE
@@ -54,6 +55,9 @@ interface AppStore {
   
   // Category/Module Navigation
   switchCategory: (category: CategoryId) => void;
+
+  // Activity Logging (delegates to activityStore)
+  logActivity: (type: ModuleId, metadata?: Record<string, unknown>) => Promise<void>;
 }
 
 // ============================================
@@ -117,16 +121,25 @@ export const useAppStore = create<AppStore>((set, get) => ({
   // When switching category, also switch to first module in that category
   switchCategory: (category) => {
     const { isActive } = get();
-    
+
     // Don't allow category switch while active
     if (isActive) return;
-    
+
     const firstModule = ALL_MODULES.find((m) => m.category === category);
-    
+
     set({
       currentCategory: category,
       currentModule: firstModule?.id || 'breath',
     });
+  },
+
+  // Activity Logging (delegates to activityStore)
+  logActivity: async (type, metadata = {}) => {
+    try {
+      await useActivityStore.getState().logActivity(type, metadata);
+    } catch (err) {
+      console.error('Failed to log activity:', err);
+    }
   },
 }));
 

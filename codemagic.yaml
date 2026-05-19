@@ -38,19 +38,8 @@ workflows:
         script: npx --yes eas-cli@18 build --platform android --profile production --non-interactive
       - name: Submit to Google Play
         script: |
-          echo "📦 Getting latest build..."
-          BUILD_INFO=$(npx --yes eas-cli@18 build:list --platform android --limit 1 --json)
-          AAB_URL=$(echo $BUILD_INFO | grep -o '"url":"[^"]*\.aab' | cut -d'"' -f4)
-
-          echo "📥 Downloading AAB from EAS: $AAB_URL"
-          curl -L -o /tmp/app.aab "$AAB_URL"
-
-          echo "📦 Installing googleapis..."
-          npm install googleapis
-
           echo "🚀 Submitting to Google Play..."
-          export GCLOUD_SERVICE_ACCOUNT_CREDENTIALS="$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS"
-          node submit-to-playstore.js /tmp/app.aab
+          npx --yes eas-cli@18 submit --platform android --profile production --non-interactive
     artifacts:
       - "*.aab"
       - "**/*.aab"
